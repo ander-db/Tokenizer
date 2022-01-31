@@ -39,7 +39,7 @@ Tokenizador::Tokenizador()
 
 /**
  * @brief Destructor de la clase Tokenizador. Establece delimiters a "".
- * 
+ *
  */
 Tokenizador::~Tokenizador()
 {
@@ -47,7 +47,7 @@ Tokenizador::~Tokenizador()
 
 /**
  * @brief Sobrecarga del operador copia.
- * 
+ *
  * @param tokenizador Tokenizador a copiar.
  * @return Nuevo tokenizador.
  */
@@ -63,6 +63,14 @@ Tokenizador &Tokenizador::operator=(const Tokenizador &tokenizador)
  */
 void Tokenizador::Tokenizar(const string &str, list<string> &tokens) const
 {
+	string::size_type lastPos = str.find_first_not_of(delimiters, 0);
+	string::size_type pos = str.find_first_of(delimiters, lastPos);
+	while (string::npos != pos || string::npos != lastPos)
+	{
+		tokens.push_back(str.substr(lastPos, pos - lastPos));
+		lastPos = str.find_first_not_of(delimiters, pos);
+		pos = str.find_first_of(delimiters, lastPos);
+	}
 }
 
 /**
@@ -73,8 +81,39 @@ void Tokenizador::Tokenizar(const string &str, list<string> &tokens) const
  * @return true Si se realizar la tokenizacion de forma correcta.
  * @return false Si no se realiza la tokenizacoin de forma correcta (p. ej. que no existe el archivo i)
  */
-bool Tokenizador::Tokenizar(const string &i, const string &f) const
+bool Tokenizador::Tokenizar(const string &NomFichEntr, const string &NomFichSal) const
 {
+	ifstream i;
+	ofstream f;
+	string cadena;
+	list<string> tokens;
+	i.open(NomFichEntr.c_str());
+	if (!i)
+	{
+		cerr << "ERROR: No existe el archivo: " << NomFichEntr << endl;
+		return false;
+	}
+	else
+	{
+		while (!i.eof())
+		{
+			cadena = "";
+			getline(i, cadena);
+			if (cadena.length() != 0)
+			{
+				Tokenizar(cadena, tokens);
+			}
+		}
+	}
+	i.close();
+	f.open(NomFichSal.c_str());
+	list<string>::iterator itS;
+	for (itS = tokens.begin(); itS != tokens.end(); itS++)
+	{
+		f << (*itS) << endl;
+	}
+	f.close();
+	return true;
 	return false;
 }
 
@@ -91,10 +130,10 @@ bool Tokenizador::Tokenizar(const string &i) const
 
 /**
  * @brief  Tokeniza el fichero i que contiene un nombre de fichero por línea guardando la salida en ficheros (uno por cada línea de i) cuyo nombre será el leído en i añadiéndole extensión .tk, y que contendrá una palabra en cada línea del fichero leído en i. Devolverá true si se realiza la tokenización de forma correcta de todos los archivos que contiene i; devolverá false en caso contrario enviando a cerr el mensaje correspondiente (p.ej. que no exista el archivo i, o que se trate de un directorio, enviando a “cerr” los archivos de i que no existan o que sean directorios; luego no se ha de interrumpir la ejecución si hay algún archivo en i que no exista)
- * 
+ *
  * @param i Fichero con lista de ficheros a tokenizar.
  * @return true Se han podido tokenizar los archivos de i con exito.
- * @return false Si no se ha podido tokenizar con exito. P.ej. No existen los directorios de i. 
+ * @return false Si no se ha podido tokenizar con exito. P.ej. No existen los directorios de i.
  */
 bool Tokenizador::TokenizarListaFicheros(const string &i) const
 {
@@ -102,20 +141,33 @@ bool Tokenizador::TokenizarListaFicheros(const string &i) const
 }
 
 /**
- * @brief Tokeniza todos los archivos que contenga el directorio i, incluyendo los de los subdirectorios, guardando la salida en ficheros cuyo nombre será el de entrada añadiéndole extensión .tk, y que contendrá una palabra en cada línea del fichero. 
- * 
+ * @brief Tokeniza todos los archivos que contenga el directorio i, incluyendo los de los subdirectorios, guardando la salida en ficheros cuyo nombre será el de entrada añadiéndole extensión .tk, y que contendrá una palabra en cada línea del fichero.
+ *
  * @param i Directorio
  * @return true Se ha realizado la tokenizacion de forma correcta de los archivos del directorio i.
  * @return false No se ha podido realizar la tokenizacion. P.ej. No existe el directorio i
  */
-bool Tokenizador::TokenizarDirectorio(const string &i) const
+bool Tokenizador::TokenizarDirectorio(const string &dirAIndexar) const
 {
-	return false;
+	/*
+	struct stat dir;
+	// Compruebo la existencia del directorio
+	int err = stat(dirAIndexar.c_str(), &dir);
+	if (err == -1 || !S_ISDIR(dir.st_mode))
+		return false;
+	else
+	{
+		// Hago una lista en un fichero con find>fich
+		string cmd = "find " + dirAIndexar + " -follow |sort > .lista_fich";
+		system(cmd.c_str());
+		return TokenizarListaFicheros(".lista_fich");
+	}
+	*/
 }
 
 /**
- * @brief Cambia “delimiters” por “nuevoDelimiters” comprobando que no hayan delimitadores repetidos (de izquierda a derecha), en cuyo caso se eliminarían los que hayan sido repetidos (los nuevos delimitadores que se van analizando) tanto en “nuevoDelimiters” como los que ya estuviesen en “delimiters” 
- * 
+ * @brief Cambia “delimiters” por “nuevoDelimiters” comprobando que no hayan delimitadores repetidos (de izquierda a derecha), en cuyo caso se eliminarían los que hayan sido repetidos (los nuevos delimitadores que se van analizando) tanto en “nuevoDelimiters” como los que ya estuviesen en “delimiters”
+ *
  * @param nuevoDelimiters Nuevos delimitadores
  */
 void Tokenizador::DelimitadoresPalabra(const string &nuevoDelimiters)
@@ -124,7 +176,7 @@ void Tokenizador::DelimitadoresPalabra(const string &nuevoDelimiters)
 
 /**
  * @brief Añade al final de “delimiters” los nuevos delimitadores que aparezcan en “nuevoDelimiters” (no se almacenarán caracteres repetidos)
- * 
+ *
  * @param nuevoDelimiters Delimiter a añadir.
  */
 void Tokenizador::AnyadirDelimitadoresPalabra(const string &nuevoDelimiters)
@@ -133,8 +185,8 @@ void Tokenizador::AnyadirDelimitadoresPalabra(const string &nuevoDelimiters)
 
 /**
  * @brief Getter de la variable "delimiters".
- * 
- * @return Delimiters 
+ *
+ * @return Delimiters
  */
 string Tokenizador::DelimitadoresPalabra() const
 {
@@ -143,25 +195,26 @@ string Tokenizador::DelimitadoresPalabra() const
 
 /**
  * @brief Setter de la variable casosEspeciales
- * 
+ *
  * @param nuevoCasosEspeciales Nuevo casos especiales
  */
 void Tokenizador::CasosEspeciales(const bool &nuevoCasosEspeciales)
 {
+
 	this->casosEspeciales = nuevoCasosEspeciales;
 }
 
 /**
- * @brief Getter de casos especiales 
+ * @brief Getter de casos especiales
  */
-bool Tokenizador::CasosEspeciales()
+bool Tokenizador::CasosEspeciales() const
 {
 	return this->casosEspeciales;
 }
 
 /**
- * @brief Setter de la variable pasarAminuscSinAcentos 
- * 
+ * @brief Setter de la variable pasarAminuscSinAcentos
+ *
  * @param nuevoPasarAminuscSinAcentos Nuevo valor de pasarAmunuscSinAcentos
  */
 void Tokenizador::PasarAminuscSinAcentos(const bool &nuevoPasarAminuscSinAcentos)
@@ -171,7 +224,15 @@ void Tokenizador::PasarAminuscSinAcentos(const bool &nuevoPasarAminuscSinAcentos
 /**
  * @brief Getter de pasarAminuscSinAcentos
  */
-bool Tokenizador::PasarAminuscSinAcentos()
+bool Tokenizador::PasarAminuscSinAcentos() const
 {
 	return this->pasarAminuscSinAcentos;
+}
+
+/**
+ * @brief Sobrecarga del metodo <<
+ */
+ostream &operator<<(ostream &os, const Tokenizador tok)
+{
+	cout << "DELIMITADORES: " << tok.DelimitadoresPalabra() << " TRATA CASOS ESPECIALES: " << tok.CasosEspeciales() << " PASAR A MINUSCULAS Y SIN ACENTOS: " << tok.PasarAminuscSinAcentos();
 }
