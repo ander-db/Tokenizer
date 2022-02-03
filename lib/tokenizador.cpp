@@ -1,4 +1,4 @@
-#include "Tokenizador.h"
+#include "tokenizador.h"
 
 /**
  * @brief Inicializa delimiters a delimitadoresPalabra filtrando que no se  introduzcan delimitadores repetidos (de izquierda a derecha, en cuyo  caso se eliminarían los que hayan sido repetidos por la derecha); casosEspeciales a kcasosEspeciales; pasarAminuscSinAcentos a minuscSinAcentos
@@ -65,6 +65,7 @@ void Tokenizador::Tokenizar(const string &str, list<string> &tokens) const
 {
 	string::size_type lastPos = str.find_first_not_of(delimiters, 0);
 	string::size_type pos = str.find_first_of(delimiters, lastPos);
+
 	while (string::npos != pos || string::npos != lastPos)
 	{
 		tokens.push_back(str.substr(lastPos, pos - lastPos));
@@ -124,8 +125,39 @@ bool Tokenizador::Tokenizar(const string &NomFichEntr, const string &NomFichSal)
  * @return true
  * @return false
  */
-bool Tokenizador::Tokenizar(const string &i) const
+bool Tokenizador::Tokenizar(const string &NomFichEntr) const
 {
+	ifstream i;
+	ofstream f;
+	string cadena;
+	list<string> tokens;
+	i.open(NomFichEntr.c_str());
+	if (!i)
+	{
+		cerr << "ERROR: No existe el archivo: " << NomFichEntr << endl;
+		return false;
+	}
+	else
+	{
+		while (!i.eof())
+		{
+			cadena = "";
+			getline(i, cadena);
+			if (cadena.length() != 0)
+			{
+				Tokenizar(cadena, tokens);
+			}
+		}
+	}
+	i.close();
+	f.open((NomFichEntr + ".tk").c_str());
+	list<string>::iterator itS;
+	for (itS = tokens.begin(); itS != tokens.end(); itS++)
+	{
+		f << (*itS) << endl;
+	}
+	f.close();
+	return true;
 }
 
 /**
@@ -135,8 +167,30 @@ bool Tokenizador::Tokenizar(const string &i) const
  * @return true Se han podido tokenizar los archivos de i con exito.
  * @return false Si no se ha podido tokenizar con exito. P.ej. No existen los directorios de i.
  */
-bool Tokenizador::TokenizarListaFicheros(const string &i) const
+bool Tokenizador::TokenizarListaFicheros(const string &NomFichEntr) const
 {
+	ifstream i;
+	ofstream f;
+	string cadena;
+	list<string> tokens;
+	i.open(NomFichEntr.c_str());
+	if (!i)
+	{
+		cerr << "ERROR: No existe el archivo: " << NomFichEntr << endl;
+		return false;
+	}
+	else
+	{
+		while (!i.eof())
+		{
+			cadena = "";
+			getline(i, cadena);
+			if (cadena.length() != 0)
+			{
+				Tokenizar(cadena);
+			}
+		}
+	}
 	return false;
 }
 
@@ -190,6 +244,7 @@ void Tokenizador::AnyadirDelimitadoresPalabra(const string &nuevoDelimiters)
  */
 string Tokenizador::DelimitadoresPalabra() const
 {
+
 	return this->delimiters;
 }
 

@@ -6,10 +6,13 @@
 #include <ostream>
 #include <string>
 #include <list>
+#include <unordered_map>
+#include <string_view>
 
 using namespace std;
 
 const string DEFAULT_DELIMETERS = ",;:.-/+*\\ '\"{}[]()<>¡!¿?&#=\t\n\r@";
+//const unordered_map<string, int> DEFAULT_DELIMETERS = {{"-", 1}, {"_", 2}};
 const string DAFAULT_CASOS_ESPECIALES_DELIMETERS = "\\ \n";
 
 const char CASO_ESPECIAL_GUIONES = '-';
