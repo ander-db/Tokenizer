@@ -9,7 +9,7 @@
  */
 Tokenizador::Tokenizador(const string &delimitadoresPalabra, const bool &kcasosEspeciales, const bool &minuscSinAcentos)
 {
-	string delimitadoresPalabraUnicos = delimitadoresPalabra;
+	string delimitadoresPalabraUnicos = delimitadoresPalabra+"\\ \n";
 	eliminarCaracteresRepetidos(delimitadoresPalabraUnicos);
 	this->delimiters = delimitadoresPalabraUnicos;
 	this->casosEspeciales = kcasosEspeciales;
@@ -234,8 +234,10 @@ bool Tokenizador::TokenizarDirectorio(const string &dirAIndexar) const
  */
 void Tokenizador::DelimitadoresPalabra(const string &nuevoDelimiters)
 {
-	// TODO: Eliminar repetidos.
-	this->delimiters = nuevoDelimiters;
+	string delimitadoresUnicos = nuevoDelimiters+" \n";
+	eliminarCaracteresRepetidos(delimitadoresUnicos);
+
+	this->delimiters = delimitadoresUnicos;
 }
 
 /**
@@ -245,12 +247,10 @@ void Tokenizador::DelimitadoresPalabra(const string &nuevoDelimiters)
  */
 void Tokenizador::AnyadirDelimitadoresPalabra(const string &nuevoDelimiters)
 {
-	// TODO: Eliminar repetidos.
-
 	for (auto it = nuevoDelimiters.begin(); it != nuevoDelimiters.end(); ++it)
 	{
 		// Print current character
-		if (this->delimiters.find(*it) != string::npos)
+		if (this->delimiters.find(*it) == string::npos)
 			this->delimiters += *it;
 	}
 }
@@ -321,7 +321,7 @@ void Tokenizador::eliminarCaracteresRepetidos(string &cadena)
 }
 
 /**
- * @brief Sobrecarga del metodo <<
+ * @brief Aunque se modifique el almacenamiento de los delimitadores por temas  de eficiencia, el campo delimiters se imprimirá con el string leído en  el tokenizador (tras las modificaciones y eliminación de los caracteres repetidos correspondientes)
  */
 ostream &operator<<(ostream &os, const Tokenizador &tok)
 {

@@ -2,7 +2,7 @@
 
 CC=g++
 OPTIONS= -g -std=gnu++0x
-DEBUG= #-D DEBUG 
+DEBUG= -D DEBUG 
 LIBDIR=lib
 INCLUDEDIR=include
 _OBJ= tokenizador.o
