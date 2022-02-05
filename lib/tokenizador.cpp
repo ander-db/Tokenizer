@@ -9,7 +9,9 @@
  */
 Tokenizador::Tokenizador(const string &delimitadoresPalabra, const bool &kcasosEspeciales, const bool &minuscSinAcentos)
 {
-	this->delimiters = delimitadoresPalabra;
+	string delimitadoresPalabraUnicos = delimitadoresPalabra;
+	eliminarCaracteresRepetidos(delimitadoresPalabraUnicos);
+	this->delimiters = delimitadoresPalabraUnicos;
 	this->casosEspeciales = kcasosEspeciales;
 	this->pasarAminuscSinAcentos = minuscSinAcentos;
 }
@@ -43,6 +45,8 @@ Tokenizador::Tokenizador()
  */
 Tokenizador::~Tokenizador()
 {
+	// TODO: Preguntar que se hace con los bool, Los pasamos a false?
+	this->delimiters = "";
 }
 
 /**
@@ -53,6 +57,11 @@ Tokenizador::~Tokenizador()
  */
 Tokenizador &Tokenizador::operator=(const Tokenizador &tokenizador)
 {
+	this->delimiters = tokenizador.delimiters;
+	this->casosEspeciales = tokenizador.casosEspeciales;
+	this->pasarAminuscSinAcentos = tokenizador.pasarAminuscSinAcentos;
+
+	return *this;
 }
 
 /**
@@ -63,6 +72,7 @@ Tokenizador &Tokenizador::operator=(const Tokenizador &tokenizador)
  */
 void Tokenizador::Tokenizar(const string &str, list<string> &tokens) const
 {
+	// TODO: Casos especiales
 	string::size_type lastPos = str.find_first_not_of(delimiters, 0);
 	string::size_type pos = str.find_first_of(delimiters, lastPos);
 
@@ -203,7 +213,6 @@ bool Tokenizador::TokenizarListaFicheros(const string &NomFichEntr) const
  */
 bool Tokenizador::TokenizarDirectorio(const string &dirAIndexar) const
 {
-	/*
 	struct stat dir;
 	// Compruebo la existencia del directorio
 	int err = stat(dirAIndexar.c_str(), &dir);
@@ -212,11 +221,10 @@ bool Tokenizador::TokenizarDirectorio(const string &dirAIndexar) const
 	else
 	{
 		// Hago una lista en un fichero con find>fich
-		string cmd = "find " + dirAIndexar + " -follow |sort > .lista_fich";
+		string cmd = "find " + dirAIndexar + " -type f -follow > .lista_fich";
 		system(cmd.c_str());
 		return TokenizarListaFicheros(".lista_fich");
 	}
-	*/
 }
 
 /**
@@ -226,6 +234,8 @@ bool Tokenizador::TokenizarDirectorio(const string &dirAIndexar) const
  */
 void Tokenizador::DelimitadoresPalabra(const string &nuevoDelimiters)
 {
+	// TODO: Eliminar repetidos.
+	this->delimiters = nuevoDelimiters;
 }
 
 /**
@@ -235,6 +245,14 @@ void Tokenizador::DelimitadoresPalabra(const string &nuevoDelimiters)
  */
 void Tokenizador::AnyadirDelimitadoresPalabra(const string &nuevoDelimiters)
 {
+	// TODO: Eliminar repetidos.
+
+	for (auto it = nuevoDelimiters.begin(); it != nuevoDelimiters.end(); ++it)
+	{
+		// Print current character
+		if (this->delimiters.find(*it) != string::npos)
+			this->delimiters += *it;
+	}
 }
 
 /**
@@ -244,7 +262,6 @@ void Tokenizador::AnyadirDelimitadoresPalabra(const string &nuevoDelimiters)
  */
 string Tokenizador::DelimitadoresPalabra() const
 {
-
 	return this->delimiters;
 }
 
@@ -274,6 +291,7 @@ bool Tokenizador::CasosEspeciales() const
  */
 void Tokenizador::PasarAminuscSinAcentos(const bool &nuevoPasarAminuscSinAcentos)
 {
+	this->pasarAminuscSinAcentos = nuevoPasarAminuscSinAcentos;
 }
 
 /**
@@ -285,9 +303,28 @@ bool Tokenizador::PasarAminuscSinAcentos() const
 }
 
 /**
+ * @brief Elimina los caracteres repetidos de cadena.
+ *
+ * @param cadena Cadena a eliminar los caracteres repetidos
+ */
+void Tokenizador::eliminarCaracteresRepetidos(string &cadena)
+{
+	string res = "";
+
+	for (auto it = cadena.begin(); it != cadena.end(); ++it)
+	{
+		if (res.find(*it) == string::npos)
+			res += *it;
+	}
+
+	cadena = res;
+}
+
+/**
  * @brief Sobrecarga del metodo <<
  */
-ostream &operator<<(ostream &os, const Tokenizador tok)
+ostream &operator<<(ostream &os, const Tokenizador &tok)
 {
-	cout << "DELIMITADORES: " << tok.DelimitadoresPalabra() << " TRATA CASOS ESPECIALES: " << tok.CasosEspeciales() << " PASAR A MINUSCULAS Y SIN ACENTOS: " << tok.PasarAminuscSinAcentos();
+	os << "DELIMITADORES: " << tok.DelimitadoresPalabra() << " TRATA CASOS ESPECIALES: " << tok.CasosEspeciales() << " PASAR A MINUSCULAS Y SIN ACENTOS: " << tok.PasarAminuscSinAcentos();
+	return os;
 }

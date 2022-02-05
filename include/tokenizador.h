@@ -7,7 +7,7 @@
 #include <string>
 #include <list>
 #include <unordered_map>
-#include <string_view>
+#include <sys/stat.h>
 
 using namespace std;
 
@@ -42,6 +42,9 @@ private:
 	 *
 	 */
 	bool pasarAminuscSinAcentos;
+
+
+	static void eliminarCaracteresRepetidos(string&);
 
 public:
 	Tokenizador(const string &delimitadoresPalabra, const bool &kcasosEspeciales, const bool &minuscSinAcentos);
