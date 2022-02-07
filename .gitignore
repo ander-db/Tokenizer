@@ -45,3 +45,6 @@
 *.vsix
 .vscode/launch.json
 practica1
+corpus
+*.txt
+pruebas
