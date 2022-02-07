@@ -6,16 +6,68 @@
 #include <ostream>
 #include <string>
 #include <list>
-#include <unordered_map>
+#include <unordered_set>
 #include <sys/stat.h>
+#include <vector>
+#include <algorithm>
 
 using namespace std;
 
-const string DEFAULT_DELIMETERS = ",;:.-/+*\\ '\"{}[]()<>¡!¿?&#=\t\n\r@";
-//const unordered_map<string, int> DEFAULT_DELIMETERS = {{"-", 1}, {"_", 2}};
-const string DAFAULT_CASOS_ESPECIALES_DELIMETERS = "\\ \n";
+struct Delimitadores
+{
+	std::unordered_set<char> mapDelimiters;
+	std::string delimitadoresOrdenados;
+};
 
-const char CASO_ESPECIAL_GUIONES = '-';
+/**
+ * @brief Delimitadores por defecto.
+ *
+ */
+static const string DEFAULT_DELIMETERS_STR_ORDENADO = ",;:.-/+*\\ '\"{}[]()<>¡!¿?&#=\t\n\r@";
+
+/**
+ * @brief Set desordenado de delimitadores por defecto.
+ *
+ */
+static const std::unordered_set<char> DEFAULT_DELIMETERS_SET = unordered_set<char>(begin(DEFAULT_DELIMETERS_STR_ORDENADO), end(DEFAULT_DELIMETERS_STR_ORDENADO));
+
+/**
+ * @brief Estructura de los delimitadores por defecto (set de delimitadores y string ordenado).
+ *
+ */
+static const Delimitadores DEFAULT_STRUCT_DELIMITADORES{
+	DEFAULT_DELIMETERS_SET,
+	DEFAULT_DELIMETERS_STR_ORDENADO};
+
+/**
+ * @brief Set de caracteres que siempre delimitan
+ *
+ */
+static const std::unordered_set<char> SIEMPRE_DELIMITAN_SET = {' ', '\n'};
+
+/**
+ * @brief String de caracteres que siempre delimitan.
+ *
+ */
+static const string SIEMPRE_DELIMITAN_STR = "\\  \n";
+
+/**
+ * @brief Estructura de los delimitadores que siempre delimitan (aunque no se especifiquen)
+ *
+ */
+static const Delimitadores SIEMPRE_DELIMITAN_STRUCT =
+	{
+		SIEMPRE_DELIMITAN_SET,
+		SIEMPRE_DELIMITAN_STR};
+
+static const string DAFAULT_CASOS_ESPECIALES_DELIMETERS = "\\ \n";
+static const char CASO_ESPECIAL_GUIONES = '-';
+
+/**
+ * @brief Estructura que almacena un set de los delimitadores,
+ * y un string de los delimitadores ordenados.
+ *
+ */
 
 class Tokenizador
 {
@@ -29,7 +81,13 @@ private:
 	 * @brief Delimitadores de terminos. Aunque se modifique la forma de almacenamiento interna para mejorar la eficiencia, este campo debe permanecer para indicar el orden en que se introdujeron los delimitadores.
 	 *
 	 */
-	string delimiters;
+	// string delimiters;
+
+	/**
+	 * @brief  Delimitadores de terminos. Almacena el caracter y la posicion
+	 *
+	 */
+	Delimitadores delimiters;
 
 	/**
 	 * @brief Si true detectará palabras compuestas y casos especiales. Sino, trabajará al igual que el algoritmo propuesto en la sección “Versión del tokenizador vista en clase”
@@ -43,8 +101,7 @@ private:
 	 */
 	bool pasarAminuscSinAcentos;
 
-
-	static void eliminarCaracteresRepetidos(string&);
+	static void eliminarCaracteresRepetidos(string &);
 
 public:
 	Tokenizador(const string &delimitadoresPalabra, const bool &kcasosEspeciales, const bool &minuscSinAcentos);
@@ -80,6 +137,9 @@ public:
 	void PasarAminuscSinAcentos(const bool &nuevoPasarAminuscSinAcentos);
 
 	bool PasarAminuscSinAcentos() const;
+
+
+
 };
 
 #endif
