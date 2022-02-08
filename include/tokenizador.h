@@ -10,7 +10,9 @@
 #include <sys/stat.h>
 #include <vector>
 #include <algorithm>
-
+#include <memory>
+#include <xmmintrin.h>
+#include <vector>
 using namespace std;
 
 struct Delimitadores
@@ -81,13 +83,13 @@ private:
 	 * @brief Delimitadores de terminos. Aunque se modifique la forma de almacenamiento interna para mejorar la eficiencia, este campo debe permanecer para indicar el orden en que se introdujeron los delimitadores.
 	 *
 	 */
-	// string delimiters;
+	string delimiters;
 
 	/**
 	 * @brief  Delimitadores de terminos. Almacena el caracter y la posicion
 	 *
 	 */
-	Delimitadores delimiters;
+	//Delimitadores delimiters;
 
 	/**
 	 * @brief Si true detectará palabras compuestas y casos especiales. Sino, trabajará al igual que el algoritmo propuesto en la sección “Versión del tokenizador vista en clase”

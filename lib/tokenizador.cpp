@@ -1,7 +1,5 @@
 #include "tokenizador.h"
 
-
-
 /**
  * @brief Inicializa delimiters a delimitadoresPalabra filtrando que no se  introduzcan delimitadores repetidos (de izquierda a derecha, en cuyo  caso se eliminarían los que hayan sido repetidos por la derecha); casosEspeciales a kcasosEspeciales; pasarAminuscSinAcentos a minuscSinAcentos
  *
@@ -13,13 +11,14 @@ Tokenizador::Tokenizador(const string &delimitadoresPalabra, const bool &kcasosE
 {
 	string stringDelimitadoresUnicos = delimitadoresPalabra;
 	eliminarCaracteresRepetidos(stringDelimitadoresUnicos);
-
-	this->delimiters.mapDelimiters = unordered_set<char>(begin(delimitadoresPalabra), end(delimitadoresPalabra));
 	
-	this->delimiters.mapDelimiters.insert(' ');
-	this->delimiters.mapDelimiters.insert('\n');
+	this->delimiters = delimitadoresPalabra;
 
-	this->delimiters.delimitadoresOrdenados = stringDelimitadoresUnicos;
+	//this->delimiters.mapDelimiters = unordered_set<char>(begin(delimitadoresPalabra), end(delimitadoresPalabra));
+	//this->delimiters.mapDelimiters.insert(' ');
+	//this->delimiters.mapDelimiters.insert('\n');
+
+	//this->delimiters.delimitadoresOrdenados = stringDelimitadoresUnicos;
 
 	this->casosEspeciales = kcasosEspeciales;
 	this->pasarAminuscSinAcentos = minuscSinAcentos;
@@ -43,7 +42,8 @@ Tokenizador::Tokenizador(const Tokenizador &tokenizador)
  */
 Tokenizador::Tokenizador()
 {
-	this->delimiters = DEFAULT_STRUCT_DELIMITADORES;
+	//this->delimiters = DEFAULT_STRUCT_DELIMITADORES;
+	this->delimiters = DEFAULT_DELIMETERS_STR_ORDENADO;
 	this->casosEspeciales = true;
 	this->pasarAminuscSinAcentos = false;
 }
@@ -55,8 +55,9 @@ Tokenizador::Tokenizador()
 Tokenizador::~Tokenizador()
 {
 	// TODO: Preguntar que se hace con los bool, Los pasamos a false?
-	this->delimiters.delimitadoresOrdenados.clear();
-	this->delimiters.delimitadoresOrdenados = "";
+	//this->delimiters.delimitadoresOrdenados.clear();
+	//this->delimiters.delimitadoresOrdenados = "";
+	this->delimiters = "";
 }
 
 /**
@@ -85,13 +86,22 @@ void Tokenizador::Tokenizar(const string &str, list<string> &tokens) const
 {
 
 	// TODO: Casos especiales
-	string::size_type lastPos = str.find_first_not_of(delimiters.delimitadoresOrdenados, 0);
+	/*string::size_type lastPos = str.find_first_not_of(delimiters.delimitadoresOrdenados, 0);
 	string::size_type pos = str.find_first_of(delimiters.delimitadoresOrdenados, lastPos);
 	while (string::npos != pos || string::npos != lastPos)
 	{
 		tokens.push_back(str.substr(lastPos, pos - lastPos));
 		lastPos = str.find_first_not_of(this->delimiters.delimitadoresOrdenados, pos);
 		pos = str.find_first_of(this->delimiters.delimitadoresOrdenados, lastPos);
+	}*/
+	//tokens = std::list<string>(aux.begin(), aux.end());
+	string::size_type lastPos = str.find_first_not_of(delimiters, 0);
+	string::size_type pos = str.find_first_of(delimiters, lastPos);
+	while (string::npos != pos || string::npos != lastPos)
+	{
+		tokens.push_back(str.substr(lastPos, pos - lastPos));
+		lastPos = str.find_first_not_of(this->delimiters, pos);
+		pos = str.find_first_of(this->delimiters, lastPos);
 	}
 }
 
@@ -152,8 +162,22 @@ bool Tokenizador::Tokenizar(const string &NomFichEntr) const
 	}
 	else
 	{
-		std::getline(std::ifstream(NomFichEntr), cadena, '\0');
+		// ** Menos memoria. Mas Lento. 1412kb - 6 segs
+		std::getline(i, cadena, '\0');
 		Tokenizar(cadena, tokens);
+
+		// ** Mas memoria. Mas rapido. 4400kb - 3 segs
+		/**
+		ifstream bigFile("mybigfile.dat");
+		constexpr size_t bufferSize = 1024 * 1024;
+		unique_ptr<char[]> buffer(new char[bufferSize]);
+		while (bigFile)
+		{
+			bigFile.read(buffer.get(), bufferSize);
+			Tokenizar(cadena, tokens); //
+			// process data in buffer
+
+		}*/
 	}
 	i.close();
 	f.open((NomFichEntr + ".tk").c_str());
@@ -175,7 +199,7 @@ bool Tokenizador::Tokenizar(const string &NomFichEntr) const
  */
 bool Tokenizador::TokenizarListaFicheros(const string &NomFichEntr) const
 {
-	//TODO: Cmabiar nombres variables para entenderlo mejor.
+	// TODO: Cmabiar nombres variables para entenderlo mejor.
 	ifstream i;
 	ofstream f;
 	string cadena;
@@ -231,14 +255,15 @@ bool Tokenizador::TokenizarDirectorio(const string &dirAIndexar) const
  */
 void Tokenizador::DelimitadoresPalabra(const string &nuevoDelimiters)
 {
-	string delimitadoresUnicos = nuevoDelimiters+" \n";
+	string delimitadoresUnicos = nuevoDelimiters + " \n";
 	eliminarCaracteresRepetidos(delimitadoresUnicos);
 
-	this->delimiters.mapDelimiters = unordered_set<char>(begin(nuevoDelimiters), end(nuevoDelimiters));
-	this->delimiters.mapDelimiters.insert(' ');
-	this->delimiters.mapDelimiters.insert('\n');
+	//this->delimiters.mapDelimiters = unordered_set<char>(begin(nuevoDelimiters), end(nuevoDelimiters));
+	//this->delimiters.mapDelimiters.insert(' ');
+	//this->delimiters.mapDelimiters.insert('\n');
 
-	this->delimiters.delimitadoresOrdenados = delimitadoresUnicos;
+	//this->delimiters.delimitadoresOrdenados = delimitadoresUnicos;
+	this->delimiters = delimitadoresUnicos;
 }
 
 /**
@@ -251,9 +276,11 @@ void Tokenizador::AnyadirDelimitadoresPalabra(const string &nuevoDelimiters)
 	for (auto it = nuevoDelimiters.begin(); it != nuevoDelimiters.end(); ++it)
 	{
 		// Print current character
-		if (this->delimiters.delimitadoresOrdenados.find(*it) != string::npos)
+		/*if (this->delimiters.delimitadoresOrdenados.find(*it) != string::npos)
 			this->delimiters.mapDelimiters.insert(*it);
-			this->delimiters.delimitadoresOrdenados += *it;
+		this->delimiters.delimitadoresOrdenados += *it;*/
+		if (this->delimiters.find(*it) == string::npos)
+			this->delimiters += *it;
 	}
 }
 
@@ -264,7 +291,8 @@ void Tokenizador::AnyadirDelimitadoresPalabra(const string &nuevoDelimiters)
  */
 string Tokenizador::DelimitadoresPalabra() const
 {
-	return this->delimiters.delimitadoresOrdenados;
+	//return this->delimiters.delimitadoresOrdenados;
+	return this->delimiters;
 }
 
 /**
@@ -330,4 +358,3 @@ ostream &operator<<(ostream &os, const Tokenizador &tok)
 	os << "DELIMITADORES: " << tok.DelimitadoresPalabra() << " TRATA CASOS ESPECIALES: " << tok.CasosEspeciales() << " PASAR A MINUSCULAS Y SIN ACENTOS: " << tok.PasarAminuscSinAcentos();
 	return os;
 }
-
