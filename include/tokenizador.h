@@ -11,14 +11,26 @@
 #include <vector>
 #include <algorithm>
 #include <memory>
-#include <xmmintrin.h>
+#include <xmmintrin.h> // Ensamblador
 #include <vector>
+#include <map>
+
+#include <sys/mman.h>
+
+
 using namespace std;
 
 struct Delimitadores
 {
 	std::unordered_set<char> mapDelimiters;
 	std::string delimitadoresOrdenados;
+};
+
+struct TokenInfo
+{
+	vector <int> estado;
+	vector <int> principioToken;
+	vector <int> finalToken;
 };
 
 /**
@@ -84,12 +96,13 @@ private:
 	 *
 	 */
 	string delimiters;
+	string test;
 
 	/**
 	 * @brief  Delimitadores de terminos. Almacena el caracter y la posicion
 	 *
 	 */
-	//Delimitadores delimiters;
+	// Delimitadores delimiters;
 
 	/**
 	 * @brief Si true detectará palabras compuestas y casos especiales. Sino, trabajará al igual que el algoritmo propuesto en la sección “Versión del tokenizador vista en clase”
@@ -103,9 +116,14 @@ private:
 	 */
 	bool pasarAminuscSinAcentos;
 
+
+
 	static void eliminarCaracteresRepetidos(string &);
 
 public:
+	static const unsigned int TP_BASICO[3][2];
+	static const unsigned int TP_MULTIPALABRA[6][3];
+
 	Tokenizador(const string &delimitadoresPalabra, const bool &kcasosEspeciales, const bool &minuscSinAcentos);
 
 	Tokenizador(const Tokenizador &);
@@ -121,6 +139,18 @@ public:
 	bool Tokenizar(const string &i, const string &f) const;
 
 	bool Tokenizar(const string &i) const;
+
+	// TODO
+	void TokenizarCasosEspeciales(const std::string &, list<string> &) const;
+
+
+	void casoEspecialMultipalabra(vector<char>& , vector<unsigned int>&, map<unsigned int, string>&) const;
+	void casoEspecialAcronimo(vector<char>& , vector<unsigned int>&, map<unsigned int, string>&) const;
+	void casoEspecialBasico(std::string& , vector<unsigned int>&, map<unsigned int, string>&) const;
+
+
+	// TODO
+	bool TokenizarFicheroCasosEspeciales(const std::string &, const std::ofstream &) const;
 
 	bool TokenizarListaFicheros(const string &i) const;
 
@@ -139,9 +169,6 @@ public:
 	void PasarAminuscSinAcentos(const bool &nuevoPasarAminuscSinAcentos);
 
 	bool PasarAminuscSinAcentos() const;
-
-
-
 };
 
 #endif

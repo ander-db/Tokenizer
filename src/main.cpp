@@ -1,26 +1,42 @@
 #include <iostream>
-#include <memory>
-#include "../include/tokenizador.h"
+#include <string>
 #include <list>
+#include "tokenizador.h"
 #include <chrono>
 
 using namespace std;
 
-int main()
+///////// Comprobaci�n de que vac�e la lista resultado
+
+void imprimirListaSTL(const list<string> &cadena)
 {
-	Tokenizador tok1;
-	list<string> tokens;
+        list<string>::const_iterator itCadena;
+        for (itCadena = cadena.begin(); itCadena != cadena.end(); itCadena++)
+        {
+                cout << (*itCadena) << ", ";
+        }
+        cout << endl;
+}
 
-	auto start = std::chrono::system_clock::now();
+int main(void)
+{
+        bool kCasosEspeciales = true, kpasarAminusculas = false;
 
+        list<string> lt1, lt2;
 
-	tok1.TokenizarListaFicheros("listaFicheros.txt");
+        Tokenizador a(".-#", true, false);
+        list<string> tokens;
+        auto start = std::chrono::system_clock::now();
+        a.Tokenizar("a-U.S.A-b ander", tokens);
+        auto end = std::chrono::system_clock::now();
 
-	auto end = std::chrono::system_clock::now();
+        std::chrono::duration<float, std::milli> duration = end - start;
+        //std::cout << duration.count() << "ms " << std::endl;
+        imprimirListaSTL(tokens);
 
-	std::chrono::duration<float,std::milli> duration = end - start;
-    std::cout << duration.count() << "ms " << std::endl;
+        a.Tokenizar("..U.S.A", tokens);
+        imprimirListaSTL(tokens);
 
-
-	return 0;
+        a.Tokenizar("U.S.A..", tokens);
+        imprimirListaSTL(tokens);
 }
