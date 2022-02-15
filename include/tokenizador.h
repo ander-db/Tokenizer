@@ -14,9 +14,9 @@
 #include <xmmintrin.h> // Ensamblador
 #include <vector>
 #include <map>
+#include <ctype.h>
 
 #include <sys/mman.h>
-
 
 using namespace std;
 
@@ -28,9 +28,9 @@ struct Delimitadores
 
 struct TokenInfo
 {
-	vector <int> estado;
-	vector <int> principioToken;
-	vector <int> finalToken;
+	vector<int> estado;
+	vector<int> principioToken;
+	vector<int> finalToken;
 };
 
 /**
@@ -96,7 +96,6 @@ private:
 	 *
 	 */
 	string delimiters;
-	string test;
 
 	/**
 	 * @brief  Delimitadores de terminos. Almacena el caracter y la posicion
@@ -116,13 +115,14 @@ private:
 	 */
 	bool pasarAminuscSinAcentos;
 
-
-
 	static void eliminarCaracteresRepetidos(string &);
 
 public:
-	static const unsigned int TP_BASICO[3][2];
-	static const unsigned int TP_MULTIPALABRA[6][3];
+	static const unsigned char TP_BASICO[3][2];
+	static const unsigned char TP_MULTIPALABRA[6][3];
+	static const unsigned char TP_ACRONIMO[6][3];
+	static const unsigned char TP_EMAIL[5][4];
+	static const unsigned char TP_NUMERO[7][3];
 
 	Tokenizador(const string &delimitadoresPalabra, const bool &kcasosEspeciales, const bool &minuscSinAcentos);
 
@@ -140,14 +140,20 @@ public:
 
 	bool Tokenizar(const string &i) const;
 
+	bool TokenizarFicheroOptimizado(const string &i) const;
+
 	// TODO
 	void TokenizarCasosEspeciales(const std::string &, list<string> &) const;
 
+	void casoEspecialNumero(vector<char> &, vector<unsigned int> &, map<unsigned int, string> &) const;
+	void casoEspecialEmail(vector<char> &, vector<unsigned int> &, map<unsigned int, string> &) const;
 
-	void casoEspecialMultipalabra(vector<char>& , vector<unsigned int>&, map<unsigned int, string>&) const;
-	void casoEspecialAcronimo(vector<char>& , vector<unsigned int>&, map<unsigned int, string>&) const;
-	void casoEspecialBasico(std::string& , vector<unsigned int>&, map<unsigned int, string>&) const;
+	void casoEspecialMultipalabra(vector<char> &, vector<unsigned int> &, map<unsigned int, string> &) const;
+	void casoEspecialAcronimo(vector<char> &, vector<unsigned int> &, map<unsigned int, string> &) const;
 
+	void casoEspecialBasico(std::string &, vector<unsigned int> &, map<unsigned int, string> &) const;
+
+	void procesarNumero(std::string &numero) const;
 
 	// TODO
 	bool TokenizarFicheroCasosEspeciales(const std::string &, const std::ofstream &) const;

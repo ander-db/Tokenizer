@@ -6,21 +6,48 @@
  * @brief Tabla de pesos para la deteccion mediante automata del caso acronimos.
  *
  */
-const unsigned int Tokenizador::TP_MULTIPALABRA[6][3] = {
-	{1, 0, 0},
-	{1, 2, 0},
-	{3, 0, 0},
-	{3, 4, 5},
-	{3, 5, 5},
-	{5, 5, 5}};
+const unsigned char Tokenizador::TP_MULTIPALABRA[6][3] = {{1, 0, 0},
+														  {1, 2, 0},
+														  {3, 0, 0},
+														  {3, 4, 5},
+														  {3, 5, 5},
+														  {5, 5, 5}};
+
+const unsigned char Tokenizador::TP_ACRONIMO[6][3] = {{1, 0, 0},
+													  {0, 2, 0},
+													  {3, 0, 0},
+													  {5, 4, 5},
+													  {3, 5, 5},
+													  {5, 5, 5}};
 
 /**
  * @brief Tabla de pesos para la deteccion mediante automata del caso basico.
+ * //TODO: Borrar
+ */
+const unsigned char Tokenizador::TP_BASICO[3][2] = {{1, 0},
+													{1, 2},
+													{2, 2}};
+
+/**
+ * @brief Tabla de pesos para el caso especial Email
  *
  */
-const unsigned int Tokenizador::TP_BASICO[3][2] = {{1, 0},
-												   {1, 2},
-												   {2, 2}};
+const unsigned char Tokenizador::TP_EMAIL[5][4] = {{1, 0, 0, 0},
+												   {1, 2, 2, 0},
+												   {3, 0, 0, 0},
+												   {5, 4, 0, 4},
+												   {5, 5, 5, 5}};
+/**
+ * @brief Tabla de pesos para el caso especial Numeros.
+ *
+ */
+const unsigned char Tokenizador::TP_NUMERO[7][3] = {{1, 2, 0},
+													{1, 2, 0},
+													{4, 2, 0},
+													{4, 0, 0},
+													{4, 5, 6},
+													{4, 6, 6},
+													{6, 6, 6}};
 
 // TODO: Comprobar cuanto tarda en ejecutarse este codigo en el ordenador de clase.
 /**
@@ -223,19 +250,6 @@ bool Tokenizador::Tokenizar(const string &NomFichEntr) const
 		// ** Menos memoria. Mas Lento. 1412kb - 6 segs
 		std::getline(i, cadena, '\0');
 		Tokenizar(cadena, tokens);
-
-		// ** Mas memoria. Mas rapido. 4400kb - 3 segs
-		/**
-		ifstream bigFile("mybigfile.dat");
-		constexpr size_t bufferSize = 1024 * 1024;
-		unique_ptr<char[]> buffer(new char[bufferSize]);
-		while (bigFile)
-		{
-			bigFile.read(buffer.get(), bufferSize);
-			Tokenizar(cadena, tokens); //
-			// process data in buffer
-
-		}*/
 	}
 	i.close();
 	f.open((NomFichEntr + ".tk").c_str());
@@ -248,30 +262,35 @@ bool Tokenizador::Tokenizar(const string &NomFichEntr) const
 	return true;
 }
 
-
-
 void Tokenizador::TokenizarCasosEspeciales(const std::string &cadena, list<string> &tokens) const
 {
 	vector<char> vecCadena(cadena.begin(), cadena.end());
 	vector<unsigned int> posCadena;
+	posCadena.reserve(cadena.size());
 	for (size_t i = 0; i < vecCadena.size(); ++i)
-		posCadena.push_back(i);
+		posCadena.emplace_back(i);
 
 	std::map<unsigned int, string> posTokens;
-	
-	casoEspecialAcronimo(vecCadena, posCadena, posTokens);
-	casoEspecialMultipalabra(vecCadena, posCadena, posTokens);
-	
+
+	// casoEspecialEmail(vecCadena, posCadena, posTokens);
+
+	// if (this->delimiters.find(',') != string::npos || this->delimiters.find('.') != string::npos)
+	//	casoEspecialNumero(vecCadena, posCadena, posTokens);
+	if (this->delimiters.find('.') != string::npos)
+		casoEspecialAcronimo(vecCadena, posCadena, posTokens);
+	if (this->delimiters.find('-') != string::npos)
+		casoEspecialMultipalabra(vecCadena, posCadena, posTokens);
+
 	string aux(vecCadena.begin(), vecCadena.end());
 	casoEspecialBasico(aux, posCadena, posTokens);
 
-	cout << "----" << endl;
+	// cout << "----" << endl;
 	for (auto &value : posTokens)
 	{
-		//cout << value.first << '-' << value.second << endl;
+		// cout << value.first << '-' << value.second << endl;
 		tokens.push_back(value.second);
 	}
-	cout << "----" << endl;
+	// cout << "----" << endl;
 }
 
 void Tokenizador::casoEspecialBasico(std::string &cadena, std::vector<unsigned int> &posiciones, std::map<unsigned int, string> &posTokens) const
@@ -282,7 +301,7 @@ void Tokenizador::casoEspecialBasico(std::string &cadena, std::vector<unsigned i
 	string::size_type pos = cadena.find_first_of(delimiters, lastPos);
 	while (string::npos != pos || string::npos != lastPos)
 	{
-		//tokens.push_back(cadena.substr(lastPos, pos - lastPos));
+		// tokens.push_back(cadena.substr(lastPos, pos - lastPos));
 		posTokens.insert({posiciones[lastPos], cadena.substr(lastPos, pos - lastPos)});
 
 		lastPos = cadena.find_first_not_of(this->delimiters, pos);
@@ -290,60 +309,82 @@ void Tokenizador::casoEspecialBasico(std::string &cadena, std::vector<unsigned i
 	}
 }
 
-void Tokenizador::casoEspecialMultipalabra(std::vector<char> &cadena, std::vector<unsigned int> &posiciones, std::map<unsigned int, string> &posTokens) const
+bool Tokenizador::TokenizarFicheroOptimizado(const string &NomFichEntr) const
 {
-	if (this->delimiters.find('-') == string::npos)
-		return; // Si no es delimitador este caso especial no se ejuta.
-
-	unsigned int conjunto = 0;
-	unsigned int estado = 0;
-	unsigned int principio = 0;
-
-	unsigned int i = 0;
-	unsigned int iEnd = cadena.size();
-	char character;
-	int final = 0;
-
-	while (i < iEnd)
+	// TODO: Casos especiales
+	ifstream i;
+	ofstream f;
+	string cadena;
+	list<string> tokens;
+	i.open(NomFichEntr.c_str());
+	if (!i)
 	{
-		if (delimiters.find(cadena[0]) != string::npos)
-		{
-			cadena.erase(cadena.begin() + 0);
-			posiciones.erase(posiciones.begin() + 0);
-			--iEnd;
-			continue;
-		}
+		cerr << "ERROR: No existe el archivo: " << NomFichEntr << endl;
+		return false;
+	}
+	else
+		std::getline(i, cadena, '\0');
 
-		character = cadena[i];
+	f.open((NomFichEntr + ".tk").c_str());
 
-		if (character == '-')
+	string::size_type lastPos = cadena.find_first_not_of(delimiters, 0);
+	string::size_type pos = cadena.find_first_of(delimiters, lastPos);
+	while (string::npos != pos || string::npos != lastPos)
+	{
+		f << cadena.substr(lastPos, pos - lastPos) << '\n';
+		lastPos = cadena.find_first_not_of(this->delimiters, pos);
+		pos = cadena.find_first_of(this->delimiters, lastPos);
+	}
+	i.close();
+	f.close();
+	return true;
+}
+
+void Tokenizador::casoEspecialNumero(std::vector<char> &cadena, std::vector<unsigned int> &posiciones, std::map<unsigned int, string> &posTokens) const
+{
+	unsigned int iEnd = cadena.size();
+	unsigned int principio = 0;
+	unsigned int i = 0;
+	unsigned int final = 0;
+	unsigned char conjunto = 0;
+	unsigned char estado = 0;
+
+	string tokenNumero;
+
+	while (i < cadena.size())
+	{
+
+		if (cadena[i] == '.' || cadena[i] == ',')
 			conjunto = 1;
-		else if (delimiters.find(character) != string::npos)
-			conjunto = 2;
-		else
+		else if (isdigit(cadena[i]))
 			conjunto = 0;
+		else
+			conjunto = 2;
 
 		switch (estado)
 		{
 		case 0:
-			principio = i;
-			estado = TP_MULTIPALABRA[0][conjunto];
+			estado = TP_NUMERO[0][conjunto];
 			break;
 		case 1:
-			estado = TP_MULTIPALABRA[1][conjunto];
+			estado = TP_NUMERO[1][conjunto];
+			principio = i;
 			break;
 		case 2:
-			estado = TP_MULTIPALABRA[2][conjunto];
+			estado = TP_NUMERO[2][conjunto];
 			break;
-
 		case 3:
-			estado = TP_MULTIPALABRA[3][conjunto];
-
-			if (estado == 5)
+			estado = TP_NUMERO[3][conjunto];
+			break;
+		case 4:
+			estado = TP_NUMERO[4][conjunto];
+			if (estado == 6)
 			{
 				final = i;
 				estado = 0;
-				posTokens.insert({posiciones[principio], std::string(cadena.begin() + principio, cadena.begin() + final)});
+				tokenNumero = std::string(cadena.begin() + principio, cadena.begin() + final);
+				procesarNumero(tokenNumero);
+				posTokens.insert({posiciones[principio], tokenNumero});
 				i = principio;
 				if (principio != 0)
 				{
@@ -359,16 +400,16 @@ void Tokenizador::casoEspecialMultipalabra(std::vector<char> &cadena, std::vecto
 				iEnd = cadena.size();
 				continue;
 			}
-
 			break;
+		case 5:
+			estado = TP_NUMERO[5][conjunto];
 
-		case 4:
-			estado = TP_MULTIPALABRA[4][conjunto];
-
-			if (estado == 5)
+			if (estado == 6)
 			{
 				final = i - 1; // Caso de que al final hay un -
-				posTokens.insert({posiciones[principio], std::string(cadena.begin() + principio, cadena.begin() + final)});
+				tokenNumero = std::string(cadena.begin() + principio, cadena.begin() + final);
+				procesarNumero(tokenNumero);
+				posTokens.insert({posiciones[principio], tokenNumero});
 				estado = 0;
 				i = principio;
 				if (principio != 0)
@@ -394,58 +435,159 @@ void Tokenizador::casoEspecialMultipalabra(std::vector<char> &cadena, std::vecto
 
 		++i;
 	}
+}
+
+void Tokenizador::procesarNumero(std::string &numero) const
+{
+	auto pos = numero.find_first_of("0123456789", 0);
+	if (pos == 0)
+		return;
+	numero.erase(0, pos - 1);
+	numero = (numero[0] == ',') ? '0' + numero : numero.erase(0, 1);
+}
+
+void Tokenizador::casoEspecialEmail(std::vector<char> &cadena, std::vector<unsigned int> &posiciones, std::map<unsigned int, string> &posTokens) const
+{
+	unsigned int iEnd = cadena.size();
+	unsigned int principio = 0;
+	unsigned int i = 0;
+	unsigned int final = 0;
+	unsigned char conjunto = 0;
+	unsigned char estado = 0;
+
+	while (i < cadena.size())
+	{
+		if (cadena[i] == '@')
+			if (this->delimiters.find('.') != string::npos)
+				conjunto = 1;
+			else
+				conjunto = 2;
+		else if (this->delimiters.find('.') != string::npos)
+			conjunto = 3;
+		else
+			conjunto = 0;
+
+		switch (estado)
+		{
+		case 3:
+			estado = TP_EMAIL[3][conjunto];
+
+			if (estado == 4)
+			{
+				estado = 0;
+				final = i;
+				posTokens.insert({posiciones[principio], std::string(cadena.begin() + principio, cadena.begin() + final)});
+				i = principio;
+				if (principio != 0)
+				{
+					cadena.erase(cadena.begin() + principio, cadena.begin() + final);
+					posiciones.erase(posiciones.begin() + principio, posiciones.begin() + final);
+					cadena[principio] = ' ';
+				}
+				else
+				{
+					cadena.erase(cadena.begin() + principio, cadena.begin() + final);
+					posiciones.erase(posiciones.begin() + principio, posiciones.begin() + final);
+				}
+				iEnd = cadena.size();
+				continue;
+			}
+
+			break;
+		case 0:
+			principio = i;
+		default:
+			estado = TP_EMAIL[estado][conjunto];
+			break;
+		}
+		++i;
+	}
+}
+
+void Tokenizador::casoEspecialMultipalabra(std::vector<char> &cadena, std::vector<unsigned int> &posiciones, std::map<unsigned int, string> &posTokens) const
+{
+	unsigned int iEnd = cadena.size();
+	unsigned int principio = 0;
+	unsigned int i = 0;
+	unsigned int final = 0;
+	unsigned char conjunto = 0;
+	unsigned char estado = 0;
+
+	while (i < cadena.size())
+	{
+		if (delimiters.find(cadena[0]) != string::npos)
+		{
+			cadena.erase(cadena.begin() + 0);
+			posiciones.erase(posiciones.begin() + 0);
+			--iEnd;
+			continue;
+		}
+
+		if (cadena[i] == '-')
+			conjunto = 1;
+		else if (delimiters.find(cadena[i]) != string::npos)
+			conjunto = 2;
+		else
+			conjunto = 0;
+
+		switch (estado)
+		{
+		case 3:
+		case 4:
+			final = (estado == 3) ? i : i - 1;
+			estado = TP_MULTIPALABRA[estado][conjunto];
+			if (estado == 5)
+			{
+				estado = 0;
+				posTokens.insert({posiciones[principio], std::string(cadena.begin() + principio, cadena.begin() + final)});
+				cadena.erase(cadena.begin() + principio, cadena.begin() + final);
+				posiciones.erase(posiciones.begin() + principio, posiciones.begin() + final);
+
+				if (principio != 0)
+					cadena[principio] = ' ';
+
+				i = principio;
+				iEnd = cadena.size();
+				continue;
+			}
+			break;
+
+		default:
+			if (estado == 0)
+				principio = i;
+			estado = TP_MULTIPALABRA[estado][conjunto];
+			break;
+		}
+
+		++i;
+	}
 
 	// Ha terminado de recorrer la cadena. Ultima iteracion.
 	switch (estado)
 	{
 	case 3:
-		final = iEnd;
-		posTokens.insert({posiciones[principio], std::string(cadena.begin() + principio, cadena.begin() + final)});
-		if (principio != 0)
-		{
-			cadena.erase(cadena.begin() + principio, cadena.begin() + final);
-			posiciones.erase(posiciones.begin() + principio, posiciones.begin() + final);
-			cadena[principio + 1] = ' ';
-		}
-		else
-		{
-			cadena.erase(cadena.begin() + principio, cadena.begin() + final);
-			posiciones.erase(posiciones.begin() + principio, posiciones.begin() + final);
-		}
-		break;
 	case 4:
-		final = iEnd - 1;
+		final = (estado == 3) ? iEnd : iEnd - 1;
 		posTokens.insert({posiciones[principio], std::string(cadena.begin() + principio, cadena.begin() + final)});
+		cadena.erase(cadena.begin() + principio, cadena.begin() + final);
+		posiciones.erase(posiciones.begin() + principio, posiciones.begin() + final);
 		if (principio != 0)
-		{
-			cadena.erase(cadena.begin() + principio, cadena.begin() + final);
-			posiciones.erase(posiciones.begin() + principio, posiciones.begin() + final);
-			cadena[principio + 1] = ' ';
-		}
-		else
-		{
-			cadena.erase(cadena.begin() + principio, cadena.begin() + final);
-			posiciones.erase(posiciones.begin() + principio, posiciones.begin() + final);
-		}
+			cadena[principio] = ' ';
 		break;
 	default:
 		break;
 	}
 }
 
+// TODO: Modificar el grafo para que no detecte multiples letras como acronimo
 void Tokenizador::casoEspecialAcronimo(std::vector<char> &cadena, std::vector<unsigned int> &posiciones, std::map<unsigned int, string> &posTokens) const
 {
-	if (this->delimiters.find('.') == string::npos)
-		return; // Si no es delimitador este caso especial no se ejuta.
-
-	unsigned int conjunto = 0;
-	unsigned int estado = 0;
-	unsigned int principio = 0;
-
-	unsigned int i = 0;
 	unsigned int iEnd = cadena.size();
-	char character;
-	int final = 0;
+	unsigned int principio = 0;
+	unsigned int i = 0;
+	unsigned int final = 0;
+	unsigned char conjunto = 0;
+	unsigned char estado = 0;
 
 	while (i < iEnd)
 	{
@@ -457,81 +599,44 @@ void Tokenizador::casoEspecialAcronimo(std::vector<char> &cadena, std::vector<un
 			continue;
 		}
 
-		character = cadena[i];
-
-		if (character == '.')
+		if (cadena[i] == '.')
 			conjunto = 1;
-		else if (delimiters.find(character) != string::npos)
+		else if (delimiters.find(cadena[i]) != string::npos)
 			conjunto = 2;
 		else
 			conjunto = 0;
 
 		switch (estado)
 		{
-		case 0:
-			principio = i;
-			estado = TP_MULTIPALABRA[0][conjunto];
-			break;
-		case 1:
-			estado = TP_MULTIPALABRA[1][conjunto];
-			break;
-		case 2:
-			estado = TP_MULTIPALABRA[2][conjunto];
-			break;
 
 		case 3:
-			estado = TP_MULTIPALABRA[3][conjunto];
-
-			if (estado == 5)
-			{
-				final = i;
-				estado = 0;
-				posTokens.insert({posiciones[principio], std::string(cadena.begin() + principio, cadena.begin() + final)});
-				i = principio;
-				if (principio != 0)
-				{
-					cadena.erase(cadena.begin() + principio, cadena.begin() + final + 1);
-					posiciones.erase(posiciones.begin() + principio, posiciones.begin() + final + 1);
-					cadena[principio] = ' ';
-				}
-				else
-				{
-					cadena.erase(cadena.begin() + principio, cadena.begin() + final + 1);
-					posiciones.erase(posiciones.begin() + principio, posiciones.begin() + final + 1);
-				}
-				iEnd = cadena.size();
-				continue;
-			}
-
-			break;
-
 		case 4:
-			estado = TP_MULTIPALABRA[4][conjunto];
+			// TODO: Comprobar si es mejor tener dos if y no tener que hacer esta asignacioon todo el ratos.
+			final = (estado == 3) ? i : i - 1;
+			estado = TP_ACRONIMO[estado][conjunto];
 
 			if (estado == 5)
 			{
-				final = i - 1; // Caso de que al final hay un -
-				posTokens.insert({posiciones[principio], std::string(cadena.begin() + principio, cadena.begin() + final)});
 				estado = 0;
+				string borrar(cadena.begin() + principio, cadena.begin() + final);
+				posTokens.insert({posiciones[principio], std::string(cadena.begin() + principio, cadena.begin() + final)});
 				i = principio;
-				if (principio != 0)
-				{
-					cadena.erase(cadena.begin() + principio, cadena.begin() + final);
-					posiciones.erase(posiciones.begin() + principio, posiciones.begin() + final);
-					cadena[principio] = ' ';
-				}
-				else
-				{
-					cadena.erase(cadena.begin() + principio, cadena.begin() + final);
-					posiciones.erase(posiciones.begin() + principio, posiciones.begin() + final);
-				}
+				cadena[principio] = ' ';
+				cadena.erase(cadena.begin() + principio + 1, cadena.begin() + final);
+				posiciones.erase(posiciones.begin() + principio + 1, posiciones.begin() + final);
 				iEnd = cadena.size();
+
 				continue;
 			}
-
 			break;
 
 		default:
+			estado = TP_ACRONIMO[estado][conjunto];
+			if (estado == 0)
+			{
+				principio = i;
+				++estado;
+			}
 			break;
 		}
 
@@ -539,41 +644,16 @@ void Tokenizador::casoEspecialAcronimo(std::vector<char> &cadena, std::vector<un
 	}
 
 	// Ha terminado de recorrer la cadena. Ultima iteracion.
-	switch (estado)
-	{
-	case 3:
+	if (estado != 3 && estado != 4)
+		return;
+	else if (estado == 3)
 		final = iEnd;
-		posTokens.insert({posiciones[principio], std::string(cadena.begin() + principio, cadena.begin() + final)});
-		if (principio != 0)
-		{
-			cadena.erase(cadena.begin() + principio, cadena.begin() + final);
-			posiciones.erase(posiciones.begin() + principio, posiciones.begin() + final);
-			cadena[principio + 1] = ' ';
-		}
-		else
-		{
-			cadena.erase(cadena.begin() + principio, cadena.begin() + final);
-			posiciones.erase(posiciones.begin() + principio, posiciones.begin() + final);
-		}
-		break;
-	case 4:
+	else
 		final = iEnd - 1;
-		posTokens.insert({posiciones[principio], std::string(cadena.begin() + principio, cadena.begin() + final)});
-		if (principio != 0)
-		{
-			cadena.erase(cadena.begin() + principio, cadena.begin() + final);
-			posiciones.erase(posiciones.begin() + principio, posiciones.begin() + final);
-			cadena[principio + 1] = ' ';
-		}
-		else
-		{
-			cadena.erase(cadena.begin() + principio, cadena.begin() + final);
-			posiciones.erase(posiciones.begin() + principio, posiciones.begin() + final);
-		}
-		break;
-	default:
-		break;
-	}
+
+	posTokens.insert({posiciones[principio], std::string(cadena.begin() + principio, cadena.begin() + final)});
+	cadena.erase(cadena.begin() + principio, cadena.begin() + final);
+	posiciones.erase(posiciones.begin() + principio, posiciones.begin() + final);
 }
 
 /**
@@ -604,7 +684,7 @@ bool Tokenizador::TokenizarListaFicheros(const string &NomFichEntr) const
 			getline(i, cadena);
 			if (cadena.length() != 0)
 			{
-				Tokenizar(cadena);
+				TokenizarFicheroOptimizado(cadena);
 			}
 		}
 	}
