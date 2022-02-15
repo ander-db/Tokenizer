@@ -309,63 +309,45 @@ void Tokenizador::casoEspecialBasico(std::string &cadena, std::vector<unsigned i
 	}
 }
 
+/**
+ * @brief Lectura y escritura con mmap. Modificado el metodo basico.
+ *
+ * @param NomFichEntr
+ * @return true
+ * @return false
+ */
 bool Tokenizador::TokenizarFicheroOptimizado(const string &NomFichEntr) const
 {
-	// TODO: Casos especiales
-	/**
-	ifstream i;
-	ofstream f;
-	string cadena;
-	i.open(NomFichEntr.c_str());
-	if (!i)
-	{
-		cerr << "ERROR: No existe el archivo: " << NomFichEntr << endl;
-		return false;
-	}
-	else
-		std::getline(i, cadena, '\0');
+	struct stat fileIn;
+	struct stat fileOut;
 
-	f.open((NomFichEntr + ".tk").c_str());
+	int fdIn = open(NomFichEntr.c_str(), O_RDONLY, 777);
+	int errIn = stat(NomFichEntr.c_str(), &fileIn);
+	int fdOut = open((NomFichEntr + ".tk").c_str(), O_RDWR | O_CREAT, 777);
+	
 
-	string::size_type lastPos = cadena.find_first_not_of(delimiters, 0);
-	string::size_type pos = cadena.find_first_of(delimiters, lastPos);
-	while (string::npos != pos || string::npos != lastPos)
+	if (errIn == -1)
 	{
-		f << cadena.substr(lastPos, pos - lastPos) << '\n';
-		lastPos = cadena.find_first_not_of(this->delimiters, pos);
-		pos = cadena.find_first_of(this->delimiters, lastPos);
-	}
-	i.close();
-	f.close();
-	return true;
-	* 
-	 */
-	ifstream i;
-	ofstream f;
-	struct stat fileStatus;
-	int fd = open(NomFichEntr.c_str(), O_RDONLY);
-
-	if (fstat(fd, &fileStatus) == -1)
-	{
-		perror("No pude abrir el archivo\n");
+		std::cerr << "No pude abrir el archivo\n";
 		return false;
 	}
 
-	size_t fsize = fileStatus.st_size;          // <- Total size, in bytes
-	void *addr = mmap(NULL, fsize, PROT_READ, MAP_SHARED, fd, 0); // Step 3 mapping
-	string cadena((char*)addr);
-	string resultado;
-
-	if (!i)
-	{
-		cerr << "ERROR: No existe el archivo: " << NomFichEntr << endl;
+	if (fstat(fdIn, &fileIn) == -1)
 		return false;
-	}
-	//else
-		//std::getline(i, cadena, '\0');
 
-	f.open((NomFichEntr + ".tk").c_str());
+	if (fstat(fdOut, &fileOut) == -1)
+		return false;
+
+	size_t fsize = fileIn.st_size; // <- Total size, in bytes
+	size_t fileOutSize = fileOut.st_size;
+
+	void *addrRead = mmap(NULL, fsize, PROT_EXEC, MAP_SHARED, fdIn, 0); // Step 3 mapping
+	// void *addrWrite = mmap(NULL, fileOutSize,  PROT_WRITE, MAP_SHARED, fdOut, 0); // Step 3 mapping
+
+	string cadena((char *)addrRead);
+
 	int retroceso = 0;
+
 	string::size_type lastPos = cadena.find_first_of(delimiters, 0);
 	string::size_type pos = cadena.find_first_not_of(delimiters, lastPos);
 	while (string::npos != pos || string::npos != lastPos)
@@ -375,12 +357,10 @@ bool Tokenizador::TokenizarFicheroOptimizado(const string &NomFichEntr) const
 		pos = cadena.find_first_not_of(this->delimiters, lastPos);
 	}
 
-	f << cadena;
-	i.close();
-	f.close();
+	write(fdOut, cadena.c_str(), cadena.size());
+	close(fdIn);
+	close(fdOut);
 	return true;
-
-	 
 }
 
 void Tokenizador::casoEspecialNumero(std::vector<char> &cadena, std::vector<unsigned int> &posiciones, std::map<unsigned int, string> &posTokens) const
@@ -721,6 +701,7 @@ bool Tokenizador::TokenizarListaFicheros(const string &NomFichEntr) const
 	}
 	else
 	{
+		
 		while (!i.eof())
 		{
 			cadena = "";

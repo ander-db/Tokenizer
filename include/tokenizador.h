@@ -15,6 +15,9 @@
 #include <vector>
 #include <map>
 #include <ctype.h>
+#include <stdio.h>
+#include <cstdint>
+#include <cstring>
 
 #include <sys/mman.h>
 
