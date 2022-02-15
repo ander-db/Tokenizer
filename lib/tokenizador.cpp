@@ -312,10 +312,10 @@ void Tokenizador::casoEspecialBasico(std::string &cadena, std::vector<unsigned i
 bool Tokenizador::TokenizarFicheroOptimizado(const string &NomFichEntr) const
 {
 	// TODO: Casos especiales
+	/**
 	ifstream i;
 	ofstream f;
 	string cadena;
-	list<string> tokens;
 	i.open(NomFichEntr.c_str());
 	if (!i)
 	{
@@ -338,6 +338,49 @@ bool Tokenizador::TokenizarFicheroOptimizado(const string &NomFichEntr) const
 	i.close();
 	f.close();
 	return true;
+	* 
+	 */
+	ifstream i;
+	ofstream f;
+	struct stat fileStatus;
+	int fd = open(NomFichEntr.c_str(), O_RDONLY);
+
+	if (fstat(fd, &fileStatus) == -1)
+	{
+		perror("No pude abrir el archivo\n");
+		return false;
+	}
+
+	size_t fsize = fileStatus.st_size;          // <- Total size, in bytes
+	void *addr = mmap(NULL, fsize, PROT_READ, MAP_SHARED, fd, 0); // Step 3 mapping
+	string cadena((char*)addr);
+	string resultado;
+
+	if (!i)
+	{
+		cerr << "ERROR: No existe el archivo: " << NomFichEntr << endl;
+		return false;
+	}
+	//else
+		//std::getline(i, cadena, '\0');
+
+	f.open((NomFichEntr + ".tk").c_str());
+	int retroceso = 0;
+	string::size_type lastPos = cadena.find_first_of(delimiters, 0);
+	string::size_type pos = cadena.find_first_not_of(delimiters, lastPos);
+	while (string::npos != pos || string::npos != lastPos)
+	{
+		cadena.replace(lastPos, pos - lastPos, "\n");
+		lastPos = cadena.find_first_of(this->delimiters, lastPos + 1);
+		pos = cadena.find_first_not_of(this->delimiters, lastPos);
+	}
+
+	f << cadena;
+	i.close();
+	f.close();
+	return true;
+
+	 
 }
 
 void Tokenizador::casoEspecialNumero(std::vector<char> &cadena, std::vector<unsigned int> &posiciones, std::map<unsigned int, string> &posTokens) const
