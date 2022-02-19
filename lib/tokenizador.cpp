@@ -318,36 +318,38 @@ void Tokenizador::casoEspecialBasico(std::string &cadena, std::vector<unsigned i
  */
 bool Tokenizador::TokenizarFicheroOptimizado(const string &NomFichEntr) const
 {
+
 	struct stat fileIn;
-	struct stat fileOut;
 
 	int fdIn = open(NomFichEntr.c_str(), O_RDONLY, 777);
-	int errIn = stat(NomFichEntr.c_str(), &fileIn);
-	int fdOut = open((NomFichEntr + ".tk").c_str(), O_RDWR | O_CREAT, 777);
-	
+	ofstream salida(NomFichEntr + ".tk");
 
-	if (errIn == -1)
+	if (stat(NomFichEntr.c_str(), &fileIn) == -1 || fstat(fdIn, &fileIn) == -1)
 	{
 		std::cerr << "No pude abrir el archivo\n";
 		return false;
 	}
 
-	if (fstat(fdIn, &fileIn) == -1)
-		return false;
-
-	if (fstat(fdOut, &fileOut) == -1)
-		return false;
-
 	size_t fsize = fileIn.st_size; // <- Total size, in bytes
-	size_t fileOutSize = fileOut.st_size;
 
 	void *addrRead = mmap(NULL, fsize, PROT_EXEC, MAP_SHARED, fdIn, 0); // Step 3 mapping
-	// void *addrWrite = mmap(NULL, fileOutSize,  PROT_WRITE, MAP_SHARED, fdOut, 0); // Step 3 mapping
-
+	if (addrRead == MAP_FAILED)
+	{
+		std::cerr << "No pude abrir el archivo\n";
+		return false;
+	}
 	string cadena((char *)addrRead);
+	// cadena.reserve(fsize / 1.2);
+	TokenizarBasicoOptimizado((char *)addrRead, cadena);
+	close(fdIn);
 
-	int retroceso = 0;
+	salida.write(cadena.c_str(), cadena.size());
+	salida.close();
+	return true;
+}
 
+void Tokenizador::TokenizarBasicoOptimizado(const char *fileStr, std::string &cadena) const
+{
 	string::size_type lastPos = cadena.find_first_of(delimiters, 0);
 	string::size_type pos = cadena.find_first_not_of(delimiters, lastPos);
 	while (string::npos != pos || string::npos != lastPos)
@@ -356,11 +358,26 @@ bool Tokenizador::TokenizarFicheroOptimizado(const string &NomFichEntr) const
 		lastPos = cadena.find_first_of(this->delimiters, lastPos + 1);
 		pos = cadena.find_first_not_of(this->delimiters, lastPos);
 	}
+}
 
-	write(fdOut, cadena.c_str(), cadena.size());
-	close(fdIn);
-	close(fdOut);
-	return true;
+void Tokenizador::TokenizarBasicoOptimizado2(const char *fileStr, std::string &cadena) const
+{
+	size_t i = 0;
+	while (this->delimiters.find(fileStr[i]) != string::npos)
+	{
+		++i;
+	}
+
+	while (fileStr[i] != '\0')
+	{
+		if (this->delimiters.find(fileStr[i]) != string::npos)
+		{
+			cadena.push_back('\n');
+		}
+		else if (i != 0 && fileStr[i - 1] != '\n' && fileStr[i - 1] != ' ')
+			cadena.push_back(fileStr[i]);
+		++i;
+	}
 }
 
 void Tokenizador::casoEspecialNumero(std::vector<char> &cadena, std::vector<unsigned int> &posiciones, std::map<unsigned int, string> &posTokens) const
@@ -458,6 +475,34 @@ void Tokenizador::casoEspecialNumero(std::vector<char> &cadena, std::vector<unsi
 
 		++i;
 	}
+}
+
+/**
+ * @brief Actualiza el valor del estado actual.
+ *
+ * @param currentState Estado actual.
+ * @param character Caracter para calcular el siguiente estado.
+ */
+void Tokenizador::nextState(const short &currentState, const char &character) const
+{
+}
+
+/**
+ * @brief Actualiza los tokens segun el estado actual.
+ *
+ * @param currentState Estado actual
+ * @param cadena Cadena a tokenizar
+ * @param cadenaTokens Cadena con los tokens separados por saltos de linea
+ * @param principio Principio del token
+ * @param final Final del token
+ */
+void Tokenizador::updateTokens(short &currentState, const char *cadena, std::string &cadenaTokens, size_t &principio, size_t &final, int &currentPos) const
+{
+
+	// Substring de cadena desde 'principio' hasta 'currentPos - 1'
+	string newToken(cadena, principio, currentPos - principio - 1);
+	newToken.push_back('\n');
+	cadenaTokens.append(newToken);
 }
 
 void Tokenizador::procesarNumero(std::string &numero) const
@@ -701,14 +746,14 @@ bool Tokenizador::TokenizarListaFicheros(const string &NomFichEntr) const
 	}
 	else
 	{
-		
+
 		while (!i.eof())
 		{
 			cadena = "";
 			getline(i, cadena);
 			if (cadena.length() != 0)
 			{
-				TokenizarFicheroOptimizado(cadena);
+				Tokenizar(cadena);
 			}
 		}
 	}
@@ -847,4 +892,37 @@ ostream &operator<<(ostream &os, const Tokenizador &tok)
 {
 	os << "DELIMITADORES: " << tok.DelimitadoresPalabra() << " TRATA CASOS ESPECIALES: " << tok.CasosEspeciales() << " PASAR A MINUSCULAS Y SIN ACENTOS: " << tok.PasarAminuscSinAcentos();
 	return os;
+}
+
+/**
+ * @brief Modifica el caracter y lo pasa a minuscula.
+ *
+ * @param caracter Caracter a modificar.
+ */
+void Tokenizador::pasarAminuscSinAcentos(char &caracter) const
+{
+	if (caracter >= 0x41 && caracter <= 0x5a)
+	{
+		caracter += 32;
+	}
+	else if ((caracter >= 0xc0 && caracter <= 0xc5) || (caracter >= 0xe0 && caracter <= 0xe5)) // A
+	{
+		caracter = 0x61;
+	}
+	else if ((caracter >= 0xc8 && caracter <= 0xcb) || (caracter >= 0xe8 && caracter <= 0xeb)) // E
+	{
+		caracter = 0x65;
+	}
+	else if ((caracter >= 0xcc && caracter <= 0xcf) || (caracter >= 0xec && caracter <= 0xef)) // I
+	{
+		caracter = 0x69;
+	}
+	else if ((caracter >= 0xd2 && caracter <= 0xd6) || (caracter >= 0xf2 && caracter <= 0xf6)) // O
+	{
+		caracter = 0x6f;
+	}
+	else if ((caracter >= 0xd9 && caracter <= 0xdc) || (caracter >= 0xf9 && caracter <= 0xfc)) // U
+	{
+		caracter = 0x6f;
+	}
 }

@@ -23,42 +23,20 @@ int main(void)
         bool kCasosEspeciales = true, kpasarAminusculas = false;
 
         list<string> lt1, lt2;
-        Tokenizador a;
-        a.CasosEspeciales(false);
-        auto start = std::chrono::system_clock::now();
-        a.TokenizarListaFicheros("listaFicheros.txt");
-        auto end = std::chrono::system_clock::now();
-        std::chrono::duration<float, std::milli> duration = end - start;
-
-        std::cout << duration.count() << "s" << endl;
-        /**
 
         Tokenizador a(".-#", true, false);
         list<string> tokens;
         auto start = std::chrono::system_clock::now();
-        a.Tokenizar("S.U-U-U.S.AA#ANDER-DORADO-#bole", tokens);
+        a.Tokenizar("AA-U.S.A-B-C#A-B.C.D-AA-U.S.A-B-C#A-B.C.D-AA-U.S.A-B-C#A-B.C.D-AA-U.S.A-B-C#A-B.C.D-AA-U.S.A-B-C#A-B.C.D-AA-U.S.A-B-C#A-B.C.D-", tokens);
         auto end = std::chrono::system_clock::now();
 
         std::chrono::duration<float, std::milli> duration = end - start;
         //std::cout << duration.count() << "ms " << std::endl;
         imprimirListaSTL(tokens);
 
-        a.Tokenizar("..U.S.A", tokens);
+        a.Tokenizar("--ANDER-DORADO-A--A", tokens);
         imprimirListaSTL(tokens);
 
-        a.Tokenizar("U.S.A..", tokens);
+        a.Tokenizar("ANDER-DO.RADO--A", tokens);
         imprimirListaSTL(tokens);
-
-        a.Tokenizar("ANDER ANDER-DORADO-", tokens);
-        imprimirListaSTL(tokens);
-
-        a.Tokenizar("--ANDER-DORADO", tokens);
-        imprimirListaSTL(tokens);
-
-        a.Tokenizar("--ANDER-DORADO--", tokens);
-        imprimirListaSTL(tokens);
-
-        a.Tokenizar("ANDER-DORADO#--", tokens);
-        imprimirListaSTL(tokens);
-        **/
 }

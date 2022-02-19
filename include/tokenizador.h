@@ -26,6 +26,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 
+#define PERM 0644
 using namespace std;
 
 struct Delimitadores
@@ -125,6 +126,10 @@ private:
 
 	static void eliminarCaracteresRepetidos(string &);
 
+	void nextState(const short&, const char&) const;
+	void updateTokens(short &currentState, const char*, std::string &, size_t &, size_t &, int &) const;
+	void pasarAminuscSinAcentos(char &) const;
+
 public:
 	static const unsigned char TP_BASICO[3][2];
 	static const unsigned char TP_MULTIPALABRA[6][3];
@@ -149,6 +154,9 @@ public:
 	bool Tokenizar(const string &i) const;
 
 	bool TokenizarFicheroOptimizado(const string &i) const;
+
+	void TokenizarBasicoOptimizado(const char* fileStr, string &cadena)  const;
+	void TokenizarBasicoOptimizado2(const char* fileStr, string &cadena)  const;
 
 	// TODO
 	void TokenizarCasosEspeciales(const std::string &, list<string> &) const;
