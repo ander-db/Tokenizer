@@ -126,9 +126,10 @@ private:
 
 	static void eliminarCaracteresRepetidos(string &);
 
+	void calcularConjunto(unsigned char &, const char &) const;
 	void nextState(const short&, const char&) const;
 	void updateTokens(short &currentState, const char*, std::string &, size_t &, size_t &, int &) const;
-	void pasarAminuscSinAcentos(char &) const;
+	void minusculaSinAcento(char &) const;
 
 public:
 	static const unsigned char TP_BASICO[3][2];
@@ -136,6 +137,8 @@ public:
 	static const unsigned char TP_ACRONIMO[6][3];
 	static const unsigned char TP_EMAIL[5][4];
 	static const unsigned char TP_NUMERO[7][3];
+
+	static const unsigned char TP_AUTOMATA[35][12];
 
 	Tokenizador(const string &delimitadoresPalabra, const bool &kcasosEspeciales, const bool &minuscSinAcentos);
 

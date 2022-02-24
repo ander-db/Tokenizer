@@ -3,6 +3,52 @@
 // TODO: Probar usar nmap para leer archivo
 
 /**
+ * @brief Matriz automata.
+ *
+ */
+const unsigned char Tokenizador::TP_AUTOMATA[35][12] = {
+	{20, 21, 0, 0, 0, 0, 0, 0, 12, 26, 27, 1},
+	{4, 30, 5, 3, 30, 30, 30, 30, 2, 2, 2, 2},
+	{4, 30, 5, 3, 30, 30, 30, 30, 2, 2, 2, 2},
+	{29, 29, 29, 29, 29, 29, 29, 29, 6, 6, 6, 6},
+	{29, 29, 29, 29, 29, 29, 29, 29, 8, 8, 8, 8},
+	{29, 29, 29, 29, 29, 29, 29, 29, 9, 9, 9, 9},
+	{7, 30, 7, 28, 30, 7, 30, 30, 6, 6, 6, 6},
+	{29, 29, 29, 29, 29, 29, 29, 29, 6, 6, 6, 6},
+	{10, 30, 30, 30, 30, 30, 30, 30, 8, 8, 8, 8},
+	{30, 30, 11, 30, 30, 30, 30, 30, 9, 9, 9, 9},
+	{29, 29, 29, 29, 29, 29, 29, 29, 8, 8, 8, 8},
+	{29, 29, 29, 29, 29, 29, 29, 29, 9, 9, 9, 9}, // Grafo inferior
+
+	{14, 15, 5, 3, 30, 30, 30, 30, 13, 2, 2, 2},
+	{14, 15, 5, 3, 30, 30, 30, 30, 13, 2, 2, 2},
+	{29, 29, 29, 29, 29, 29, 29, 29, 16, 8, 8, 8},
+	{29, 29, 29, 29, 29, 29, 29, 29, 17, 29, 29, 29},
+	{19, 18, 30, 30, 30, 30, 30, 30, 16, 8, 8, 8}, // nodo e16
+	{18, 18, 30, 30, 34, 30, 30, 30, 17, 28, 28, 28},
+	{29, 29, 29, 29, 29, 29, 29, 29, 17, 28, 28, 28},
+	{29, 29, 29, 29, 29, 29, 29, 29, 16, 8, 8, 8},
+
+	{20, 21, 0, 0, 0, 0, 0, 0, 22, 1, 1, 1}, // nodo 20
+	{20, 21, 0, 0, 0, 0, 0, 0, 23, 1, 1, 1},
+	{24, 25, 32, 32, 32, 34, 32, 22, 33, 33, 33},
+	{25, 25, 32, 32, 32, 34, 32, 23, 33, 33, 33},
+	{31, 31, 31, 31, 31, 31, 31, 22, 33, 33, 33},
+	{31, 31, 31, 31, 31, 31, 31, 23, 33, 33, 33},
+
+	{26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26},
+	{27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27},
+
+	{28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28},
+	{29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29},
+	{30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30},
+	{31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 31},
+	{32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32},
+	{33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33},
+	{34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34}
+};
+
+/**
  * @brief Tabla de pesos para la deteccion mediante automata del caso acronimos.
  *
  */
@@ -131,7 +177,6 @@ Tokenizador &Tokenizador::operator=(const Tokenizador &tokenizador)
  * @param str String a tokenizar.
  * @param tokens Lista donde se almacenan los tokens de str.
  */
-
 void Tokenizador::Tokenizar(const string &str, list<string> &tokens) const
 {
 	tokens.clear();
@@ -339,6 +384,7 @@ bool Tokenizador::TokenizarFicheroOptimizado(const string &NomFichEntr) const
 		return false;
 	}
 	string cadena((char *)addrRead);
+	string cadena2((char *)addrRead);
 	// cadena.reserve(fsize / 1.2);
 	TokenizarBasicoOptimizado((char *)addrRead, cadena);
 	close(fdIn);
@@ -355,7 +401,7 @@ void Tokenizador::TokenizarBasicoOptimizado(const char *fileStr, std::string &ca
 	while (string::npos != pos || string::npos != lastPos)
 	{
 		cadena.replace(lastPos, pos - lastPos, "\n");
-		lastPos = cadena.find_first_of(this->delimiters, lastPos + 1);
+		lastPos = cadena.find_first_of(this->delimiters, pos);
 		pos = cadena.find_first_not_of(this->delimiters, lastPos);
 	}
 }
@@ -753,7 +799,8 @@ bool Tokenizador::TokenizarListaFicheros(const string &NomFichEntr) const
 			getline(i, cadena);
 			if (cadena.length() != 0)
 			{
-				Tokenizar(cadena);
+				// Tokenizar(cadena);
+				TokenizarFicheroOptimizado(cadena);
 			}
 		}
 	}
@@ -899,7 +946,7 @@ ostream &operator<<(ostream &os, const Tokenizador &tok)
  *
  * @param caracter Caracter a modificar.
  */
-void Tokenizador::pasarAminuscSinAcentos(char &caracter) const
+void Tokenizador::minusculaSinAcento(char &caracter) const
 {
 	if (caracter >= 0x41 && caracter <= 0x5a)
 	{
@@ -925,4 +972,14 @@ void Tokenizador::pasarAminuscSinAcentos(char &caracter) const
 	{
 		caracter = 0x6f;
 	}
+}
+
+/**
+ * @brief Almacena en conjunto, el conjunto al que pertenece el caracter.
+ *
+ * @param conjunto Conjunto
+ * @param caracter Caracter
+ */
+void Tokenizador::calcularConjunto(unsigned char &conjunto, const char &caracter) const
+{
 }

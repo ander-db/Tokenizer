@@ -24,19 +24,14 @@ int main(void)
 
         list<string> lt1, lt2;
 
-        Tokenizador a(".-#", true, false);
+        Tokenizador a;
         list<string> tokens;
         auto start = std::chrono::system_clock::now();
-        a.Tokenizar("AA-U.S.A-B-C#A-B.C.D-AA-U.S.A-B-C#A-B.C.D-AA-U.S.A-B-C#A-B.C.D-AA-U.S.A-B-C#A-B.C.D-AA-U.S.A-B-C#A-B.C.D-AA-U.S.A-B-C#A-B.C.D-", tokens);
+        a.TokenizarListaFicheros("listaFicheros.txt");
         auto end = std::chrono::system_clock::now();
 
         std::chrono::duration<float, std::milli> duration = end - start;
-        //std::cout << duration.count() << "ms " << std::endl;
-        imprimirListaSTL(tokens);
+        std::cout << duration.count() << "ms " << std::endl;
 
-        a.Tokenizar("--ANDER-DORADO-A--A", tokens);
-        imprimirListaSTL(tokens);
-
-        a.Tokenizar("ANDER-DO.RADO--A", tokens);
-        imprimirListaSTL(tokens);
+        return 0;
 }
