@@ -45,8 +45,7 @@ const unsigned char Tokenizador::TP_AUTOMATA[35][12] = {
 	{31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 31},
 	{32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32},
 	{33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33},
-	{34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34}
-};
+	{34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34}};
 
 /**
  * @brief Tabla de pesos para la deteccion mediante automata del caso acronimos.
@@ -982,4 +981,71 @@ void Tokenizador::minusculaSinAcento(char &caracter) const
  */
 void Tokenizador::calcularConjunto(unsigned char &conjunto, const char &caracter) const
 {
+
+	if (this->delimiters.find(caracter) != string::npos)
+	{
+		switch (caracter)
+		{
+		case '.':
+			conjunto = 0;
+			break;
+		case ',':
+			conjunto = 1;
+			break;
+		case '-':
+			conjunto = 2;
+			break;
+		case '@':
+			conjunto = 3;
+			break;
+		case '%':
+		case '$':
+			conjunto = 4;
+			break;
+
+		case '_':
+			conjunto = 5;
+			break;
+
+		case ':':
+		case '/':
+		case '?':
+		case '&':
+		case '=':
+		case '#':
+			conjunto = 6;
+			break;
+
+		default:
+			conjunto = 7;
+			break;
+		}
+	}
+
+	else
+	{
+		switch (caracter)
+		{
+		case '0':
+		case '1':
+		case '2':
+		case '3':
+		case '4':
+		case '5':
+		case '6':
+		case '7':
+		case '8':
+		case '9':
+			conjunto = 8;
+		case 'h':
+			conjunto = 9;
+			break;
+		case 'f':
+			conjunto = 10;
+			break;
+		default:
+			conjunto = 11;
+			break;
+		}
+	}
 }
