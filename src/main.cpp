@@ -20,18 +20,18 @@ void imprimirListaSTL(const list<string> &cadena)
 
 int main(void)
 {
-        bool kCasosEspeciales = true, kpasarAminusculas = false;
 
-        list<string> lt1, lt2;
-
-        Tokenizador a;
+        Tokenizador a(".,-@#", true, false);
+        string test1 = "test@ander@em@ail.com";
         list<string> tokens;
-        auto start = std::chrono::system_clock::now();
-        a.TokenizarListaFicheros("listaFicheros.txt");
-        auto end = std::chrono::system_clock::now();
+        cout << a << endl;
 
-        std::chrono::duration<float, std::milli> duration = end - start;
-        std::cout << duration.count() << "ms " << std::endl;
+        a.Tokenizar(test1, tokens);
+        
+
+        imprimirListaSTL(tokens);
+
+
 
         return 0;
 }

@@ -306,6 +306,7 @@ bool Tokenizador::Tokenizar(const string &NomFichEntr) const
 	return true;
 }
 
+#if 0 
 void Tokenizador::TokenizarCasosEspeciales(const std::string &cadena, list<string> &tokens) const
 {
 	vector<char> vecCadena(cadena.begin(), cadena.end());
@@ -335,6 +336,27 @@ void Tokenizador::TokenizarCasosEspeciales(const std::string &cadena, list<strin
 		tokens.push_back(value.second);
 	}
 	// cout << "----" << endl;
+}
+#endif
+
+void Tokenizador::TokenizarCasosEspeciales(const std::string &cadena, list<string> &tokens) const
+{
+	int i = 0;
+	size_t principio = 0, final_ = 0;
+	short currentState = 0;
+	string cadenaTokens;
+
+	while (cadena[i] != '\0')
+	{
+		nextState(currentState, cadena[i]);
+		updateTokens(currentState, cadena, cadenaTokens, principio, final_, i);
+		++i;
+	}
+
+	nextState(currentState, '\n');
+	updateTokens(currentState, cadena, cadenaTokens, principio, final_, i);
+
+	cout << "Soy el resultado:\n" << cadenaTokens << endl;
 }
 
 void Tokenizador::casoEspecialBasico(std::string &cadena, std::vector<unsigned int> &posiciones, std::map<unsigned int, string> &posTokens) const
@@ -382,10 +404,17 @@ bool Tokenizador::TokenizarFicheroOptimizado(const string &NomFichEntr) const
 		std::cerr << "No pude abrir el archivo\n";
 		return false;
 	}
+#if 0
 	string cadena((char *)addrRead);
 	string cadena2((char *)addrRead);
 	// cadena.reserve(fsize / 1.2);
 	TokenizarBasicoOptimizado((char *)addrRead, cadena);
+#endif
+
+	string cadena;
+
+	// TokenizarBasicoOptimizado3((char*) addrRead, cadena);
+
 	close(fdIn);
 
 	salida.write(cadena.c_str(), cadena.size());
@@ -423,6 +452,22 @@ void Tokenizador::TokenizarBasicoOptimizado2(const char *fileStr, std::string &c
 			cadena.push_back(fileStr[i]);
 		++i;
 	}
+}
+
+void Tokenizador::TokenizarCasosEspeciales2(const char *fileStr, std::string &cadena) const
+{
+	int i = 0;
+	size_t principio = 0, final_ = 0;
+	short currentState = 0;
+
+	while (fileStr[i] != '\0')
+	{
+		nextState(currentState, fileStr[i]);
+		updateTokens(currentState, fileStr, cadena, principio, final_, i);
+	}
+
+	nextState(currentState, '\n');
+	updateTokens(currentState, fileStr, cadena, principio, final_, i);
 }
 
 void Tokenizador::casoEspecialNumero(std::vector<char> &cadena, std::vector<unsigned int> &posiciones, std::map<unsigned int, string> &posTokens) const
@@ -528,8 +573,9 @@ void Tokenizador::casoEspecialNumero(std::vector<char> &cadena, std::vector<unsi
  * @param currentState Estado actual.
  * @param character Caracter para calcular el siguiente estado.
  */
-void Tokenizador::nextState(const short &currentState, const char &character) const
+void Tokenizador::nextState(short &currentState, const char &caracter) const
 {
+	currentState = TP_AUTOMATA[currentState][calcularConjunto(caracter)];
 }
 
 /**
@@ -541,15 +587,137 @@ void Tokenizador::nextState(const short &currentState, const char &character) co
  * @param principio Principio del token
  * @param final Final del token
  */
-void Tokenizador::updateTokens(short &currentState, const char *cadena, std::string &cadenaTokens, size_t &principio, size_t &final, int &currentPos) const
+void Tokenizador::updateTokens(short &currentState, const char *cadena, std::string &cadenaTokens, size_t &principio, size_t &final_, int &currentPos) const
 {
+	switch (currentState)
+	{
+	case 29:
+		cadenaTokens.append(std::string(cadena, principio, currentPos - principio - 1));
+		cadenaTokens.push_back('\n');
+		currentState = 0;
+		break;
 
-	// Substring de cadena desde 'principio' hasta 'currentPos - 1'
-	string newToken(cadena, principio, currentPos - principio - 1);
-	newToken.push_back('\n');
-	cadenaTokens.append(newToken);
+	case 30:
+		cadenaTokens.append(std::string(cadena, principio, currentPos - principio));
+		cadenaTokens.push_back('\n');
+		currentState = 0;
+		break;
+	case 31:
+		cadenaTokens.push_back('0');
+		cadenaTokens.append(std::string(cadena, principio, currentPos - principio - 1));
+		cadenaTokens.push_back('\n');
+		currentState = 0;
+	case 32:
+		cadenaTokens.push_back('0');
+		cadenaTokens.append(std::string(cadena, principio, currentPos - principio));
+		cadenaTokens.push_back('\n');
+		currentState = 0;
+	case 33:
+		currentPos = principio + 1;
+		currentState = 0;
+		break;
+
+	case 34:
+		cadenaTokens.push_back('0');
+		cadenaTokens.append(std::string(cadena, principio, currentPos - principio - 1));
+		cadenaTokens.push_back(' ');
+		cadenaTokens.push_back(cadena[currentPos]);
+		cadenaTokens.push_back('\n');
+		currentState = 0;
+		break;
+	case 28:
+		break;
+
+	case 1:
+	case 12:
+	case 20:
+	case 21:
+	case 26:
+	case 27:
+		principio = currentPos;
+		break;
+
+	case 3:
+	case 14:
+	case 15:
+	case 24:
+	case 25:
+		final_ = currentPos;
+
+	default:
+		break;
+	}
+
 }
 
+void Tokenizador::updateTokens(short &currentState, const string& cadena, std::string &cadenaTokens, size_t &principio, size_t &final_, int &currentPos) const
+{
+	switch (currentState)
+	{
+	case 29:
+		cadenaTokens.append(std::string(cadena, principio, currentPos - principio - 1));
+		cadenaTokens.push_back('\n');
+		currentState = 0;
+		break;
+
+	case 30:
+		cadenaTokens.append(std::string(cadena, principio, currentPos - principio));
+		cadenaTokens.push_back('\n');
+		currentState = 0;
+		break;
+	case 31:
+		cadenaTokens.push_back('0');
+		cadenaTokens.append(std::string(cadena, principio, currentPos - principio - 1));
+		cadenaTokens.push_back('\n');
+		currentState = 0;
+	case 32:
+		cadenaTokens.push_back('0');
+		cadenaTokens.append(std::string(cadena, principio, currentPos - principio));
+		cadenaTokens.push_back('\n');
+		currentState = 0;
+	case 33:
+		currentPos = principio + 1;
+		currentState = 0;
+		break;
+
+	case 34:
+		cadenaTokens.push_back('0');
+		cadenaTokens.append(std::string(cadena, principio, currentPos - principio - 1));
+		cadenaTokens.push_back(' ');
+		cadenaTokens.push_back(cadena[currentPos]);
+		cadenaTokens.push_back('\n');
+		currentState = 0;
+		break;
+	case 28:
+
+		cadenaTokens.append(std::string(cadena, principio, final_ - principio));
+		cadenaTokens.push_back('\n');
+		currentState = 0;
+		currentPos = final_;
+		break;
+
+	case 1:
+	case 12:
+	case 20:
+	case 21:
+	case 26:
+	case 27:
+		principio = currentPos;
+		break;
+
+	case 3:
+	case 14:
+	case 15:
+	case 24:
+	case 25:
+		final_ = currentPos;
+
+	default:
+		break;
+	}
+
+
+}
 void Tokenizador::procesarNumero(std::string &numero) const
 {
 	auto pos = numero.find_first_of("0123456789", 0);
@@ -979,7 +1147,7 @@ void Tokenizador::minusculaSinAcento(char &caracter) const
  * @param conjunto Conjunto
  * @param caracter Caracter
  */
-void Tokenizador::calcularConjunto(unsigned char &conjunto, const char &caracter) const
+unsigned char Tokenizador::calcularConjunto(const char &caracter) const
 {
 
 	if (this->delimiters.find(caracter) != string::npos)
@@ -987,25 +1155,19 @@ void Tokenizador::calcularConjunto(unsigned char &conjunto, const char &caracter
 		switch (caracter)
 		{
 		case '.':
-			conjunto = 0;
-			break;
+			return 0;
 		case ',':
-			conjunto = 1;
-			break;
+			return 1;
 		case '-':
-			conjunto = 2;
-			break;
+			return 2;
 		case '@':
-			conjunto = 3;
-			break;
+			return 3;
 		case '%':
 		case '$':
-			conjunto = 4;
-			break;
+			return 4;
 
 		case '_':
-			conjunto = 5;
-			break;
+			return 5;
 
 		case ':':
 		case '/':
@@ -1013,12 +1175,10 @@ void Tokenizador::calcularConjunto(unsigned char &conjunto, const char &caracter
 		case '&':
 		case '=':
 		case '#':
-			conjunto = 6;
-			break;
+			return 6;
 
 		default:
-			conjunto = 7;
-			break;
+			return 7;
 		}
 	}
 
@@ -1036,16 +1196,13 @@ void Tokenizador::calcularConjunto(unsigned char &conjunto, const char &caracter
 		case '7':
 		case '8':
 		case '9':
-			conjunto = 8;
+			return 8;
 		case 'h':
-			conjunto = 9;
-			break;
+			return 9;
 		case 'f':
-			conjunto = 10;
-			break;
+			return 10;
 		default:
-			conjunto = 11;
-			break;
+			return 11;
 		}
 	}
 }

@@ -127,9 +127,10 @@ private:
 
 	static void eliminarCaracteresRepetidos(string &);
 
-	void calcularConjunto(unsigned char &, const char &) const;
-	void nextState(const short&, const char&) const;
-	void updateTokens(short &currentState, const char*, std::string &, size_t &, size_t &, int &) const;
+	unsigned char calcularConjunto(const char &) const;
+	void nextState(short&, const char&) const;
+	void updateTokens(short &, const char*, std::string &, size_t &, size_t &, int &) const;
+	void updateTokens(short &, const string&, std::string &, size_t &, size_t &, int &) const;
 	void minusculaSinAcento(char &) const;
 
 public:
@@ -161,6 +162,7 @@ public:
 
 	void TokenizarBasicoOptimizado(const char* fileStr, string &cadena)  const;
 	void TokenizarBasicoOptimizado2(const char* fileStr, string &cadena)  const;
+	void TokenizarCasosEspeciales2(const char* fileStr, string &cadena)  const;
 
 	// TODO
 	void TokenizarCasosEspeciales(const std::string &, list<string> &) const;
