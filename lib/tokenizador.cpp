@@ -6,46 +6,56 @@
  * @brief Matriz automata.
  *
  */
-const unsigned char Tokenizador::TP_AUTOMATA[35][12] = {
-	{20, 21, 0, 0, 0, 0, 0, 0, 12, 26, 27, 1},
-	{4, 30, 5, 3, 30, 30, 30, 30, 2, 2, 2, 2},
-	{4, 30, 5, 3, 30, 30, 30, 30, 2, 2, 2, 2},
-	{29, 29, 29, 29, 29, 29, 29, 29, 6, 6, 6, 6},
-	{29, 29, 29, 29, 29, 29, 29, 29, 8, 8, 8, 8},
-	{29, 29, 29, 29, 29, 29, 29, 29, 9, 9, 9, 9},
-	{7, 30, 7, 28, 30, 7, 30, 30, 6, 6, 6, 6},
-	{29, 29, 29, 29, 29, 29, 29, 29, 6, 6, 6, 6},
-	{10, 30, 30, 30, 30, 30, 30, 30, 8, 8, 8, 8},
-	{30, 30, 11, 30, 30, 30, 30, 30, 9, 9, 9, 9},
-	{29, 29, 29, 29, 29, 29, 29, 29, 8, 8, 8, 8},
-	{29, 29, 29, 29, 29, 29, 29, 29, 9, 9, 9, 9}, // Grafo inferior
+const unsigned char Tokenizador::TP_AUTOMATA[45][16] = {
+	{20, 21, 0, 0, 0, 0, 0, 0, 12, 26, 27, 1, 1, 1, 1, 1}, // Nodo 0
+	{4, 40, 5, 3, 40, 40, 40, 40, 2, 2, 2, 2, 2, 2, 2, 2}, // Nodo 1
+	{4, 40, 5, 3, 40, 40, 40, 40, 2, 2, 2, 2, 2, 2, 2, 2}, // Nodo 2
+	{39, 39, 39, 39, 39, 39, 39, 39, 6, 6, 6, 6, 6, 6, 6, 6},
+	{39, 39, 39, 39, 39, 39, 39, 39, 8, 8, 8, 8, 8, 8, 8, 8},
+	{39, 39, 39, 39, 39, 39, 39, 39, 9, 9, 9, 9, 9, 9, 9, 9}, // Nodo 5
+	{7, 40, 7, 38, 40, 7, 40, 40, 6, 6, 6, 6, 6, 6, 6, 6},
+	{39, 39, 39, 39, 39, 39, 39, 39, 6, 6, 6, 6, 6, 6, 6},
+	{10, 40, 40, 40, 40, 40, 40, 40, 8, 8, 8, 8, 8, 8, 8, 8}, // Nodo 8
+	{40, 40, 11, 40, 40, 40, 40, 40, 9, 9, 9, 9, 9, 9, 9, 9}, // Nodo 9
+	{39, 39, 39, 39, 39, 39, 39, 39, 8, 8, 8, 8, 8, 8, 8, 8},
+	{39, 39, 39, 39, 39, 39, 39, 39, 9, 9, 9, 9, 9, 9, 9, 9}, // Grafo inferior
 
-	{14, 15, 5, 3, 30, 30, 30, 30, 13, 2, 2, 2},
-	{14, 15, 5, 3, 30, 30, 30, 30, 13, 2, 2, 2},
-	{29, 29, 29, 29, 29, 29, 29, 29, 16, 8, 8, 8},
-	{29, 29, 29, 29, 29, 29, 29, 29, 17, 29, 29, 29},
-	{19, 18, 30, 30, 30, 30, 30, 30, 16, 8, 8, 8}, // nodo e16
-	{18, 18, 30, 30, 34, 30, 30, 30, 17, 28, 28, 28},
-	{29, 29, 29, 29, 29, 29, 29, 29, 17, 28, 28, 28},
-	{29, 29, 29, 29, 29, 29, 29, 29, 16, 8, 8, 8},
+	{14, 15, 5, 3, 40, 40, 40, 40, 13, 2, 2, 2, 2, 2, 2, 2}, // Nodo 12
+	{14, 15, 5, 3, 40, 40, 40, 40, 13, 2, 2, 2, 2, 2, 2, 2},
+	{39, 39, 39, 39, 39, 39, 39, 39, 16, 8, 8, 8, 8, 8, 8, 8},
+	{39, 39, 39, 39, 39, 39, 39, 39, 17, 39, 39, 39, 39, 39, 39, 39},
+	{19, 18, 40, 40, 40, 40, 40, 40, 16, 8, 8, 8, 8, 8, 8, 8}, // nodo e16
+	{18, 18, 40, 40, 44, 40, 40, 40, 17, 28, 28, 28, 28, 28, 28, 28},
+	{39, 39, 39, 39, 39, 39, 39, 39, 17, 38, 38, 38, 38, 38, 38, 38},
+	{39, 39, 39, 39, 39, 39, 39, 39, 16, 8, 8, 8, 8, 8, 8, 8},
 
-	{20, 21, 0, 0, 0, 0, 0, 0, 22, 1, 1, 1}, // nodo 20
-	{20, 21, 0, 0, 0, 0, 0, 0, 23, 1, 1, 1},
-	{24, 25, 32, 32, 32, 34, 32, 22, 33, 33, 33},
-	{25, 25, 32, 32, 32, 34, 32, 23, 33, 33, 33},
-	{31, 31, 31, 31, 31, 31, 31, 22, 33, 33, 33},
-	{31, 31, 31, 31, 31, 31, 31, 23, 33, 33, 33},
+	{20, 21, 0, 0, 0, 0, 0, 0, 22, 1, 1, 1, 1, 1, 1, 1}, // nodo 20
+	{20, 21, 0, 0, 0, 0, 0, 0, 23, 1, 1, 1, 1, 1, 1, 1},
+	{24, 25, 42, 42, 44, 42, 42, 42, 22, 43, 43, 43, 43, 43, 43, 43},
+	{25, 25, 42, 42, 34, 42, 42, 42, 23, 43, 43, 43, 43, 43, 43, 43},
+	{41, 41, 41, 41, 41, 32, 41, 41, 22, 43, 43, 43, 43, 43, 43, 43},
+	{41, 41, 41, 41, 41, 32, 41, 41, 23, 43, 43, 43, 43, 43, 43, 43},
 
-	{26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26},
-	{27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27},
+	{4, 38, 5, 3, 38, 38, 38, 38, 2, 2, 2, 28, 2, 2, 2, 2},			  // Nodo 26
+	{4, 38, 5, 3, 38, 38, 38, 38, 2, 2, 2, 29, 2, 2, 2, 2},			  // Nodo 27
+	{4, 38, 5, 3, 38, 38, 38, 38, 2, 2, 2, 30, 2, 2, 2, 2},			  // Nodo 28
+	{4, 38, 5, 3, 38, 38, 38, 38, 2, 2, 2, 31, 2, 2, 2, 2},			  // Nodo 29
+	{4, 38, 5, 3, 38, 38, 38, 38, 2, 2, 2, 2, 32, 2, 2, 2},			  // Nodo 30
+	{4, 38, 5, 3, 38, 38, 38, 38, 2, 2, 2, 2, 33, 2, 2, 2},			  // Nodo 31
+	{4, 38, 5, 3, 38, 38, 38, 38, 2, 2, 2, 2, 2, 34, 36, 2},		  // Nodo 32
+	{4, 38, 5, 3, 38, 38, 38, 38, 2, 2, 2, 2, 2, 35, 2, 2},			  // Nodo 33
+	{4, 38, 5, 3, 38, 38, 36, 38, 2, 2, 2, 2, 2, 2, 36, 2},			  // Nodo 34
+	{4, 38, 5, 3, 38, 38, 36, 38, 2, 2, 2, 2, 2, 2, 36, 2},			  // Nodo 35
+	{37, 40, 37, 37, 40, 37, 37, 40, 37, 37, 37, 37, 37, 37, 37, 37}, // Nodo 36
+	{37, 40, 40, 37, 37, 40, 37, 40, 37, 37, 37, 37, 37, 37, 37, 37}, // Nodo 37
 
-	{28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28},
-	{29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29},
-	{30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30},
-	{31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 31},
-	{32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32},
-	{33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33},
-	{34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34}};
+	{38, 38, 38, 38, 38, 38, 38, 38, 38, 38, 38, 38, 38, 38, 38, 38},
+	{39, 39, 39, 39, 39, 39, 39, 39, 39, 39, 39, 39, 39, 39, 39, 39},
+	{40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 49, 40, 40, 40},
+	{41, 41, 41, 41, 41, 41, 41, 41, 41, 41, 41, 41, 41, 41, 41, 41},
+	{42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42},
+	{43, 43, 43, 43, 43, 43, 43, 43, 43, 43, 43, 43, 43, 43, 43, 43},
+	{44, 44, 44, 44, 44, 44, 44, 44, 44, 44, 44, 44, 44, 44, 44, 44}};
 
 /**
  * @brief Tabla de pesos para la deteccion mediante automata del caso acronimos.
@@ -356,7 +366,8 @@ void Tokenizador::TokenizarCasosEspeciales(const std::string &cadena, list<strin
 	nextState(currentState, '\n');
 	updateTokens(currentState, cadena, cadenaTokens, principio, final_, i);
 
-	cout << "Soy el resultado:\n" << cadenaTokens << endl;
+	cout << "Soy el resultado:\n"
+		 << cadenaTokens << endl;
 }
 
 void Tokenizador::casoEspecialBasico(std::string &cadena, std::vector<unsigned int> &posiciones, std::map<unsigned int, string> &posTokens) const
@@ -411,7 +422,10 @@ bool Tokenizador::TokenizarFicheroOptimizado(const string &NomFichEntr) const
 	TokenizarBasicoOptimizado((char *)addrRead, cadena);
 #endif
 
-	string cadena;
+	string cadena((char *)addrRead);
+	list<string> tokens;
+	// cadena.reserve(fsize / 1.2);
+	Tokenizar((char *)addrRead, tokens);
 
 	// TokenizarBasicoOptimizado3((char*) addrRead, cadena);
 
@@ -591,33 +605,35 @@ void Tokenizador::updateTokens(short &currentState, const char *cadena, std::str
 {
 	switch (currentState)
 	{
-	case 29:
+	case 39:
 		cadenaTokens.append(std::string(cadena, principio, currentPos - principio - 1));
 		cadenaTokens.push_back('\n');
 		currentState = 0;
 		break;
 
-	case 30:
+	case 40:
 		cadenaTokens.append(std::string(cadena, principio, currentPos - principio));
 		cadenaTokens.push_back('\n');
 		currentState = 0;
 		break;
-	case 31:
+	case 41:
 		cadenaTokens.push_back('0');
 		cadenaTokens.append(std::string(cadena, principio, currentPos - principio - 1));
 		cadenaTokens.push_back('\n');
 		currentState = 0;
-	case 32:
+		break;
+	case 42:
 		cadenaTokens.push_back('0');
 		cadenaTokens.append(std::string(cadena, principio, currentPos - principio));
 		cadenaTokens.push_back('\n');
 		currentState = 0;
-	case 33:
+		break;
+	case 43:
 		currentPos = principio + 1;
 		currentState = 0;
 		break;
 
-	case 34:
+	case 44:
 		cadenaTokens.push_back('0');
 		cadenaTokens.append(std::string(cadena, principio, currentPos - principio - 1));
 		cadenaTokens.push_back(' ');
@@ -625,7 +641,7 @@ void Tokenizador::updateTokens(short &currentState, const char *cadena, std::str
 		cadenaTokens.push_back('\n');
 		currentState = 0;
 		break;
-	case 28:
+	case 38:
 		break;
 
 	case 1:
@@ -647,53 +663,60 @@ void Tokenizador::updateTokens(short &currentState, const char *cadena, std::str
 	default:
 		break;
 	}
-
 }
 
-void Tokenizador::updateTokens(short &currentState, const string& cadena, std::string &cadenaTokens, size_t &principio, size_t &final_, int &currentPos) const
+void Tokenizador::updateTokens(short &currentState, const string &cadena, std::string &cadenaTokens, size_t &principio, size_t &final_, int &currentPos) const
 {
 	switch (currentState)
 	{
-	case 29:
+	case 39:
 		cadenaTokens.append(std::string(cadena, principio, currentPos - principio - 1));
 		cadenaTokens.push_back('\n');
 		currentState = 0;
+		--currentPos;
 		break;
 
-	case 30:
+	case 40:
 		cadenaTokens.append(std::string(cadena, principio, currentPos - principio));
 		cadenaTokens.push_back('\n');
 		currentState = 0;
+		--currentPos;
 		break;
-	case 31:
+	case 41:
 		cadenaTokens.push_back('0');
 		cadenaTokens.append(std::string(cadena, principio, currentPos - principio - 1));
 		cadenaTokens.push_back('\n');
 		currentState = 0;
-	case 32:
+		--currentPos;
+		break;
+	case 42:
 		cadenaTokens.push_back('0');
 		cadenaTokens.append(std::string(cadena, principio, currentPos - principio));
 		cadenaTokens.push_back('\n');
 		currentState = 0;
-	case 33:
-		currentPos = principio + 1;
+		--currentPos;
+		break;
+	case 43:
+		currentPos = principio;
 		currentState = 0;
 		break;
 
-	case 34:
+	case 44:
 		cadenaTokens.push_back('0');
-		cadenaTokens.append(std::string(cadena, principio, currentPos - principio - 1));
+		cadenaTokens.append(std::string(cadena, principio, currentPos - principio));
 		cadenaTokens.push_back(' ');
 		cadenaTokens.push_back(cadena[currentPos]);
 		cadenaTokens.push_back('\n');
 		currentState = 0;
+		--currentPos;
 		break;
-	case 28:
+	case 38:
 
 		cadenaTokens.append(std::string(cadena, principio, final_ - principio));
 		cadenaTokens.push_back('\n');
 		currentState = 0;
 		currentPos = final_;
+		--currentPos;
 		break;
 
 	case 1:
@@ -715,8 +738,6 @@ void Tokenizador::updateTokens(short &currentState, const string& cadena, std::s
 	default:
 		break;
 	}
-
-
 }
 void Tokenizador::procesarNumero(std::string &numero) const
 {
@@ -1201,8 +1222,19 @@ unsigned char Tokenizador::calcularConjunto(const char &caracter) const
 			return 9;
 		case 'f':
 			return 10;
-		default:
+		case 't':
 			return 11;
+		case 'p':
+			return 12;
+		case 's':
+			return 13;
+		case ':':
+			return 14;
+		case '%':
+		case '$':
+			return 4;
+		default:
+			return 15;
 		}
 	}
 }

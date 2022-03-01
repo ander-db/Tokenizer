@@ -140,7 +140,7 @@ public:
 	static const unsigned char TP_EMAIL[5][4];
 	static const unsigned char TP_NUMERO[7][3];
 
-	static const unsigned char TP_AUTOMATA[35][12];
+	static const unsigned char TP_AUTOMATA[45][16];
 
 	Tokenizador(const string &delimitadoresPalabra, const bool &kcasosEspeciales, const bool &minuscSinAcentos);
 

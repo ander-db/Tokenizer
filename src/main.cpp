@@ -21,17 +21,28 @@ void imprimirListaSTL(const list<string> &cadena)
 int main(void)
 {
 
-        Tokenizador a(".,-@#", true, false);
-        string test1 = "test@ander@em@ail.com";
+        Tokenizador a;
+        a.CasosEspeciales(true);
+        string test1 = "https://ander.com!";
         list<string> tokens;
-        cout << a << endl;
 
         a.Tokenizar(test1, tokens);
-        
 
         imprimirListaSTL(tokens);
 
+        cout << a << endl;
+        
 
+#if 0
+        // a.Tokenizar(test1, tokens);
+        auto start = std::chrono::system_clock::now();
+        a.TokenizarListaFicheros("listaFicheros.txt");
+        auto end = std::chrono::system_clock::now();
+
+        std::chrono::duration<float, std::milli> duration = end - start;
+        std::cout << duration.count() << "s" << std::endl;
+        // imprimirListaSTL(tokens);
+#endif
 
         return 0;
 }
