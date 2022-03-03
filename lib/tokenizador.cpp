@@ -1174,29 +1174,33 @@ ostream &operator<<(ostream &os, const Tokenizador &tok)
  */
 void Tokenizador::minusculaSinAcento(char &caracter) const
 {
-	if (caracter >= 0x41 && caracter <= 0x5a)
+	if ((unsigned char) caracter >= 0x41 && (unsigned char)caracter <= 0x5a)
 	{
 		caracter += 32;
 	}
-	else if ((caracter >= 0xc0 && caracter <= 0xc5) || (caracter >= 0xe0 && caracter <= 0xe5)) // A
+	else if (((unsigned char) caracter >= 0xc0 && (unsigned char) caracter <= 0xc5) || ((unsigned char) caracter >= 0xe0 && (unsigned char) caracter <= 0xe5)) // A
 	{
-		caracter = 0x61;
+		caracter = (unsigned char)0x61;
 	}
-	else if ((caracter >= 0xc8 && caracter <= 0xcb) || (caracter >= 0xe8 && caracter <= 0xeb)) // E
+	else if (((unsigned char) caracter >= 0xc8 && (unsigned char) caracter <= 0xcb) || ((unsigned char) caracter >= 0xe8 && (unsigned char) caracter <= 0xeb)) // E
 	{
-		caracter = 0x65;
+		caracter = (unsigned char)0x65;
 	}
-	else if ((caracter >= 0xcc && caracter <= 0xcf) || (caracter >= 0xec && caracter <= 0xef)) // I
+	else if (((unsigned char) caracter >= 0xcc && (unsigned char) caracter <= 0xcf) || ((unsigned char) caracter >= 0xec && (unsigned char) caracter <= 0xef)) // I
 	{
-		caracter = 0x69;
+		caracter = (unsigned char)0x69;
 	}
-	else if ((caracter >= 0xd2 && caracter <= 0xd6) || (caracter >= 0xf2 && caracter <= 0xf6)) // O
+	else if (((unsigned char) caracter >= 0xd2 && (unsigned char) caracter <= 0xd6) || ((unsigned char) caracter >= 0xf2 && (unsigned char) caracter <= 0xf6)) // O
 	{
-		caracter = 0x6f;
+		caracter = (unsigned char)0x6f;
 	}
-	else if ((caracter >= 0xd9 && caracter <= 0xdc) || (caracter >= 0xf9 && caracter <= 0xfc)) // U
+	else if (((unsigned char) caracter >= 0xd9 && (unsigned char) caracter <= 0xdc) || ((unsigned char) caracter >= 0xf9 && (unsigned char) caracter <= 0xfc)) // U
 	{
-		caracter = 0x6f;
+		caracter = (unsigned char)0x75;
+	}
+	else if((unsigned char) caracter == 0xd1)
+	{
+		caracter = (unsigned char) 0xf1;
 	}
 }
 
