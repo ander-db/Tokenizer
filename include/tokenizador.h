@@ -132,6 +132,7 @@ private:
 	void updateTokens(short &, const char*, std::string &, size_t &, size_t &, int &) const;
 	void updateTokens(short &, const string&, std::string &, size_t &, size_t &, int &) const;
 	void minusculaSinAcento(char &) const;
+	void cadenaAListaTokens(const string &, list <string> &) const;
 
 public:
 	static const unsigned char TP_BASICO[3][2];
@@ -140,7 +141,7 @@ public:
 	static const unsigned char TP_EMAIL[5][4];
 	static const unsigned char TP_NUMERO[7][3];
 
-	static const unsigned char TP_AUTOMATA[45][16];
+	static const unsigned char TP_AUTOMATA[45][17];
 
 	Tokenizador(const string &delimitadoresPalabra, const bool &kcasosEspeciales, const bool &minuscSinAcentos);
 
@@ -163,6 +164,7 @@ public:
 	void TokenizarBasicoOptimizado(const char* fileStr, string &cadena)  const;
 	void TokenizarBasicoOptimizado2(const char* fileStr, string &cadena)  const;
 	void TokenizarCasosEspeciales2(const char* fileStr, string &cadena)  const;
+	void TokenizarCasosEspeciales3(const char* fileStr, string &cadena, list <string> &tokens)  const;
 
 	// TODO
 	void TokenizarCasosEspeciales(const std::string &, list<string> &) const;

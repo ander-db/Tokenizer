@@ -37,6 +37,6 @@ int main(void)
         a.Tokenizar("--ANDER-DORADO-A--A", tokens);
         imprimirListaSTL(tokens);
 
-        a.Tokenizar("ANDER-DO.RADO--A", tokens);
+        a.Tokenizar("u.s.a", tokens);
         imprimirListaSTL(tokens);
 }

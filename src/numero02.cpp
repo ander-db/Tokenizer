@@ -5,7 +5,7 @@
 
 using namespace std;
 
-///////// Comprobaciï¿½n de que vacï¿½e la lista resultado
+///////// Comprobación de que vacíe la lista resultado
 
 void imprimirListaSTL(const list<string>& cadena)
 {
@@ -27,14 +27,7 @@ main(void)
 Tokenizador a("", true, false); 
 list<string> tokens; 
 
-a.Tokenizar("http:", tokens);
-	imprimirListaSTL(tokens);
-
-a.Tokenizar("http:////ab/", tokens);
-	imprimirListaSTL(tokens);
-
-a.Tokenizar("http:////ab.", tokens);
-	imprimirListaSTL(tokens);
-
+a.Tokenizar("10.000.a.000 ,,23.05 10/12/85 1,23E+10", lt1);
+imprimirListaSTL(lt1);
 
 }

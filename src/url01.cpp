@@ -5,7 +5,7 @@
 
 using namespace std;
 
-///////// Comprobaciï¿½n de que vacï¿½e la lista resultado
+///////// Comprobación de que vacíe la lista resultado
 
 void imprimirListaSTL(const list<string>& cadena)
 {
@@ -24,7 +24,7 @@ main(void)
 
 	list<string> lt1, lt2;
 
-Tokenizador a("", true, false); 
+Tokenizador a("-#:/.", true, false); 
 list<string> tokens; 
 
 a.Tokenizar("http:", tokens);

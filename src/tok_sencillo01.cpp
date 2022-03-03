@@ -18,13 +18,11 @@ void imprimirListaSTL(const list<string>& cadena)
 int
 main(void)
 {
-		bool kCasosEspeciales = true, kpasarAminusculas = true;
+		bool kCasosEspeciales = true, kpasarAminusculas = false;
 
 		list<string> lt1, lt2, lt3;
 
 		Tokenizador a("[]# ", kCasosEspeciales, kpasarAminusculas);
-
-
 		a.Tokenizar("MS#DOS OS_2 [high low]", lt1);
 		imprimirListaSTL(lt1);
 
@@ -36,16 +34,4 @@ main(void)
 		a.Tokenizar("MS#DOS OS_2 [high low]", lt3);
 		imprimirListaSTL(lt3);
 
-		a.DelimitadoresPalabra(" _");
-		a.Tokenizar("MS#DOS 10 España Éspáñé OS_2 [high low]", lt3);
-		imprimirListaSTL(lt3);
-
-		a.Tokenizar("áéíóú ÁÉÍÓÚ Ññ ", lt3);
-		imprimirListaSTL(lt3);
-
-		a.PasarAminuscSinAcentos(false);
-		a.DelimitadoresPalabra(" _");
-		a.Tokenizar("MS#DOS 10 España Éspáñé OS_2 [high low]", lt3);
-		imprimirListaSTL(lt3);
-		
 }
