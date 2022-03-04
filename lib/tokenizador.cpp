@@ -36,13 +36,13 @@ const unsigned char Tokenizador::TP_AUTOMATA[45][17] = {
 	{40, 40, 40, 40, 40, 32, 40, 40, 40, 22, 42, 42, 42, 42, 42, 42, 42},
 	{40, 40, 40, 40, 40, 32, 40, 40, 40, 23, 42, 42, 42, 42, 42, 42, 42},
 
-	{4, 37, 5, 3, 37, 37, 37, 37, 37, 2, 2, 2, 28, 2, 2, 2, 2},			  // Nodo 26
-	{4, 37, 5, 3, 37, 37, 37, 37, 37, 2, 2, 2, 29, 2, 2, 2, 2},			  // Nodo 27
-	{4, 37, 5, 3, 37, 37, 37, 37, 37, 2, 2, 2, 30, 2, 2, 2, 2},			  // Nodo 28
-	{4, 37, 5, 3, 37, 37, 37, 37, 37, 2, 2, 2, 31, 2, 2, 2, 2},			  // Nodo 29
-	{4, 37, 5, 3, 37, 37, 37, 37, 37, 2, 2, 2, 2, 32, 2, 2, 2},			  // Nodo 30
-	{4, 37, 5, 3, 37, 37, 37, 37, 37, 2, 2, 2, 2, 33, 2, 2, 2},			  // Nodo 31
-	{4, 37, 5, 3, 37, 37, 35, 37, 37, 2, 2, 2, 2, 2, 34, 44, 2},		  // Nodo 32
+	{4, 38, 5, 3, 38, 38, 38, 38, 38, 2, 2, 2, 28, 2, 2, 2, 2},			  // Nodo 26
+	{4, 38, 5, 3, 38, 38, 38, 38, 38, 2, 2, 2, 29, 2, 2, 2, 2},			  // Nodo 27
+	{4, 38, 5, 3, 38, 38, 38, 38, 38, 2, 2, 2, 30, 2, 2, 2, 2},			  // Nodo 28
+	{4, 38, 5, 3, 38, 38, 38, 38, 38, 2, 2, 2, 31, 2, 2, 2, 2},			  // Nodo 29
+	{4, 38, 5, 3, 38, 38, 38, 38, 38, 2, 2, 2, 2, 32, 2, 2, 2},			  // Nodo 30
+	{4, 38, 5, 3, 38, 38, 38, 38, 38, 2, 2, 2, 2, 33, 2, 2, 2},			  // Nodo 31
+	{4, 38, 5, 3, 38, 38, 35, 38, 38, 2, 2, 2, 2, 2, 34, 44, 2},		  // Nodo 32
 	{4, 39, 5, 3, 39, 39, 35, 39, 39, 2, 2, 2, 2, 2, 3, 44, 2},			  // Nodo 33
 	{4, 39, 5, 3, 39, 39, 35, 39, 39, 2, 2, 2, 2, 2, 34, 44, 2},		  // Nodo 34
 	{36, 38, 36, 36, 36, 38, 36, 36, 38, 36, 36, 36, 36, 36, 36, 36, 36}, // Nodo 35
@@ -156,6 +156,29 @@ void Tokenizador::Tokenizar(const string &str, list<string> &tokens) const
 	}
 }
 
+bool Tokenizador::TokenizarOptimizado(string &str) const
+{
+	if (this->pasarAminuscSinAcentos)
+		for (int i = 0; i < str.size(); ++i)
+			minusculaSinAcento(str[i]);
+
+	if (this->casosEspeciales)
+		TokenizarCasosEspeciales(str);
+	else
+	{
+		string::size_type lastPos = str.find_first_of(delimiters, 0);
+		string::size_type pos = str.find_first_not_of(delimiters, lastPos);
+		while (string::npos != pos || string::npos != lastPos)
+		{
+			str.replace(lastPos, pos - lastPos, "\n");
+			lastPos = str.find_first_of(this->delimiters, pos);
+			pos = str.find_first_not_of(this->delimiters, lastPos);
+		}
+	}
+
+	return true;
+}
+
 /**
  * @brief Tokeniza el fichero i guardando la salida en el fichero f (una  palabra en cada línea del fichero). Devolverá true si se realiza la  tokenización de forma correcta; false en caso contrario enviando a cerr  el mensaje correspondiente (p.ej. que no exista el archivo i)
  *
@@ -266,39 +289,6 @@ bool Tokenizador::Tokenizar(const string &NomFichEntr) const
 	return true;
 }
 
-#if 0 
-void Tokenizador::TokenizarCasosEspeciales(const std::string &cadena, list<string> &tokens) const
-{
-	vector<char> vecCadena(cadena.begin(), cadena.end());
-	vector<unsigned int> posCadena;
-	posCadena.reserve(cadena.size());
-	for (size_t i = 0; i < vecCadena.size(); ++i)
-		posCadena.emplace_back(i);
-
-	std::map<unsigned int, string> posTokens;
-
-	// casoEspecialEmail(vecCadena, posCadena, posTokens);
-
-	// if (this->delimiters.find(',') != string::npos || this->delimiters.find('.') != string::npos)
-	//	casoEspecialNumero(vecCadena, posCadena, posTokens);
-	if (this->delimiters.find('.') != string::npos)
-		casoEspecialAcronimo(vecCadena, posCadena, posTokens);
-	if (this->delimiters.find('-') != string::npos)
-		casoEspecialMultipalabra(vecCadena, posCadena, posTokens);
-
-	string aux(vecCadena.begin(), vecCadena.end());
-	casoEspecialBasico(aux, posCadena, posTokens);
-
-	// cout << "----" << endl;
-	for (auto &value : posTokens)
-	{
-		// cout << value.first << '-' << value.second << endl;
-		tokens.push_back(value.second);
-	}
-	// cout << "----" << endl;
-}
-#endif
-
 void Tokenizador::TokenizarCasosEspeciales(const std::string &cadena, list<string> &tokens) const
 {
 	size_t principio = 0, final_ = 0;
@@ -319,6 +309,26 @@ void Tokenizador::TokenizarCasosEspeciales(const std::string &cadena, list<strin
 	cadenaAListaTokens(cadenaTokens, tokens);
 }
 
+void Tokenizador::TokenizarCasosEspeciales(std::string &cadena) const
+{
+	size_t principio = 0, final_ = 0;
+	int i = 0;
+	string cadenaTokens;
+	short currentState = 0;
+	size_t end = cadena.size();
+
+	while (i < end)
+	{
+		nextState(currentState, cadena[i]);
+		updateTokens(currentState, cadena, cadenaTokens, principio, final_, i);
+		++i;
+	}
+
+	nextState(currentState, '\n');
+	updateTokens(currentState, cadena, cadenaTokens, principio, final_, i);
+	
+	cadena = cadenaTokens;
+}
 /**
  * @brief Lectura y escritura con mmap. Modificado el metodo basico.
  *
@@ -356,14 +366,8 @@ bool Tokenizador::TokenizarFicheroOptimizado(const string &NomFichEntr) const
 #endif
 
 	string cadena((char *)addrRead);
-	cout << "Soy la cadena antes: " << cadena << endl;
-	if (this->pasarAminuscSinAcentos)
-		for (int i = 0; i < cadena.size(); ++i)
-			minusculaSinAcento(cadena[i]);
-	cout << "Soy la cadena despues: " << cadena << endl;
-	list<string> tokens;
 	// cadena.reserve(fsize / 1.2);
-	Tokenizar(cadena, tokens);
+	TokenizarOptimizado(cadena);
 
 	// TokenizarBasicoOptimizado3((char*) addrRead, cadena);
 
@@ -758,7 +762,7 @@ string Tokenizador::eliminarCaracteresRepetidos(const string &cadena)
 		if (res.find(*it) == string::npos)
 			res += *it;
 	}
-	
+
 	return res;
 }
 

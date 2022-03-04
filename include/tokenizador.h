@@ -163,6 +163,8 @@ public:
 
 	bool Tokenizar(const string &i) const;
 
+	bool TokenizarOptimizado(string &) const;
+
 	bool TokenizarFicheroOptimizado(const string &i) const;
 
 	void TokenizarBasicoOptimizado(const char* fileStr, string &cadena)  const;
@@ -172,6 +174,7 @@ public:
 
 	// TODO
 	void TokenizarCasosEspeciales(const std::string &, list<string> &) const;
+	void TokenizarCasosEspeciales(std::string &) const;
 
 	// TODO
 	bool TokenizarFicheroCasosEspeciales(const std::string &, const std::ofstream &) const;

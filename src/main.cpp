@@ -1,40 +1,37 @@
-#include <iostream> 
+#include <iostream>
 #include <string>
-#include <list> 
+#include <list>
 #include "tokenizador.h"
+#include <chrono>
 
 using namespace std;
 
-///////// Comprobación de que vacíe la lista resultado
+///////// Comprobaci?n de que vac?e la lista resultado
 
-void imprimirListaSTL(const list<string>& cadena)
+void imprimirListaSTL(const list<string> &cadena)
 {
         list<string>::const_iterator itCadena;
-        for(itCadena=cadena.begin();itCadena!=cadena.end();itCadena++)
+        for (itCadena = cadena.begin(); itCadena != cadena.end(); itCadena++)
         {
                 cout << (*itCadena) << ", ";
         }
         cout << endl;
 }
 
-int
-main(void)
+int main(void)
 {
-	bool kCasosEspeciales = true, kpasarAminusculas = false;
 
-	list<string> lt1, lt2;
+        Tokenizador a;
+        a.CasosEspeciales(true);
+        a.PasarAminuscSinAcentos(true);
+        // a.Tokenizar(test1, tokens);
+        auto start = std::chrono::system_clock::now();
+        a.TokenizarListaFicheros("listaFicheros.txt");
+        auto end = std::chrono::system_clock::now();
 
-Tokenizador a("", true, false); 
-list<string> tokens; 
+        std::chrono::duration<float, std::milli> duration = end - start;
+        std::cout << duration.count() << "s" << std::endl;
+        // imprimirListaSTL(tokens);
 
-a.Tokenizar("http:", tokens);
-	imprimirListaSTL(tokens);
-
-a.Tokenizar("http:////ab/", tokens);
-	imprimirListaSTL(tokens);
-
-a.Tokenizar("http:////ab.", tokens);
-	imprimirListaSTL(tokens);
-
-
+        return 0;
 }
