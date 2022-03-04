@@ -21,9 +21,11 @@ void imprimirListaSTL(const list<string> &cadena)
 int main(void)
 {
 
+
         Tokenizador a;
         a.CasosEspeciales(true);
         a.PasarAminuscSinAcentos(true);
+        cout << "Tam: " << sizeof(a) << endl;
         // a.Tokenizar(test1, tokens);
         auto start = std::chrono::system_clock::now();
         a.TokenizarListaFicheros("listaFicheros.txt");

@@ -2,6 +2,9 @@
 
 // TODO: Probar usar nmap para leer archivo
 
+const string Tokenizador::DEFAULT_DELIMETERS_STR_ORDENADO = ",;:.-/+*\\ '\"{}[]()<>¡!¿?&#=\t\n\r@";
+
+
 /**
  * @brief Matriz automata.
  *
@@ -105,9 +108,6 @@ Tokenizador::Tokenizador()
  */
 Tokenizador::~Tokenizador()
 {
-	// TODO: Preguntar que se hace con los bool, Los pasamos a false?
-	// this->delimiters.delimitadoresOrdenados.clear();
-	// this->delimiters.delimitadoresOrdenados = "";
 	this->delimiters = "";
 	this->delimitadoresEspeciales = " \n";
 }
@@ -189,33 +189,6 @@ bool Tokenizador::TokenizarOptimizado(string &str) const
  */
 bool Tokenizador::Tokenizar(const string &NomFichEntr, const string &NomFichSal) const
 {
-	/*
-	ifstream i;
-	ofstream f;
-	string cadena;
-	list<string> tokens;
-	i.open(NomFichEntr.c_str());
-	if (!i)
-	{
-		cerr << "ERROR: No existe el archivo: " << NomFichEntr << endl;
-		return false;
-	}
-	else
-	{
-		std::getline(std::ifstream(NomFichEntr), cadena, '\0');
-		Tokenizar(cadena, tokens);
-	}
-	i.close();
-	f.open(NomFichSal.c_str());
-	list<string>::iterator itS;
-	for (itS = tokens.begin(); itS != tokens.end(); itS++)
-	{
-		f << (*itS) << '\n';
-	}
-	f.close();
-	return true;
-	*/
-
 	std::ifstream i(NomFichEntr);
 
 	list<string> tokens;
@@ -242,7 +215,6 @@ bool Tokenizador::Tokenizar(const string &NomFichEntr, const string &NomFichSal)
 		}
 		f.close();
 
-		// Operations on `str`...
 	}
 	else
 	{
@@ -274,7 +246,6 @@ bool Tokenizador::Tokenizar(const string &NomFichEntr) const
 	}
 	else
 	{
-		// ** Menos memoria. Mas Lento. 1412kb - 6 segs
 		std::getline(i, cadena, '\0');
 		Tokenizar(cadena, tokens);
 	}
@@ -312,10 +283,11 @@ void Tokenizador::TokenizarCasosEspeciales(const std::string &cadena, list<strin
 void Tokenizador::TokenizarCasosEspeciales(std::string &cadena) const
 {
 	size_t principio = 0, final_ = 0;
-	int i = 0;
-	string cadenaTokens;
-	short currentState = 0;
 	size_t end = cadena.size();
+	string cadenaTokens;
+	cadenaTokens.reserve(cadena.size()*0.);
+	int i = 0;
+	short currentState = 0;
 
 	while (i < end)
 	{
@@ -358,88 +330,16 @@ bool Tokenizador::TokenizarFicheroOptimizado(const string &NomFichEntr) const
 		std::cerr << "No pude abrir el archivo\n";
 		return false;
 	}
-#if 0
-	string cadena((char *)addrRead);
-	string cadena2((char *)addrRead);
-	// cadena.reserve(fsize / 1.2);
-	TokenizarBasicoOptimizado((char *)addrRead, cadena);
-#endif
 
 	string cadena((char *)addrRead);
-	// cadena.reserve(fsize / 1.2);
 	TokenizarOptimizado(cadena);
-
-	// TokenizarBasicoOptimizado3((char*) addrRead, cadena);
 
 	close(fdIn);
 
-	salida.write(cadena.c_str(), cadena.size());
+	salida << cadena;
+	//salida.write(cadena.c_str(), cadena.size());
 	salida.close();
 	return true;
-}
-
-void Tokenizador::TokenizarBasicoOptimizado(const char *fileStr, std::string &cadena) const
-{
-	string::size_type lastPos = cadena.find_first_of(delimiters, 0);
-	string::size_type pos = cadena.find_first_not_of(delimiters, lastPos);
-	while (string::npos != pos || string::npos != lastPos)
-	{
-		cadena.replace(lastPos, pos - lastPos, "\n");
-		lastPos = cadena.find_first_of(this->delimiters, pos);
-		pos = cadena.find_first_not_of(this->delimiters, lastPos);
-	}
-}
-
-void Tokenizador::TokenizarBasicoOptimizado2(const char *fileStr, std::string &cadena) const
-{
-	size_t i = 0;
-	while (this->delimiters.find(fileStr[i]) != string::npos)
-	{
-		++i;
-	}
-
-	while (fileStr[i] != '\0')
-	{
-		if (this->delimiters.find(fileStr[i]) != string::npos)
-		{
-			cadena.push_back('\n');
-		}
-		else if (i != 0 && fileStr[i - 1] != '\n' && fileStr[i - 1] != ' ')
-			cadena.push_back(fileStr[i]);
-		++i;
-	}
-}
-
-void Tokenizador::TokenizarCasosEspeciales2(const char *fileStr, std::string &cadena) const
-{
-	int i = 0;
-	size_t principio = 0, final_ = 0;
-	short currentState = 0;
-
-	while (fileStr[i] != '\0')
-	{
-		nextState(currentState, fileStr[i]);
-		updateTokens(currentState, fileStr, cadena, principio, final_, i);
-	}
-
-	nextState(currentState, '\n');
-	updateTokens(currentState, fileStr, cadena, principio, final_, i);
-}
-
-void Tokenizador::TokenizarCasosEspeciales3(const char *fileStr, std::string &cadena, list<string> &tokens) const
-{
-	int i = 0;
-	size_t principio = 0, final_ = 0;
-	short currentState = 0;
-
-	while (fileStr[i] != '\0')
-	{
-		nextState(currentState, fileStr[i]);
-		updateTokens(currentState, fileStr, cadena, principio, final_, i);
-	}
-
-	nextState(currentState, '\n');
-	updateTokens(currentState, fileStr, cadena, principio, final_, i);
 }
 
 void Tokenizador::cadenaAListaTokens(const string &cadena, list<string> &tokens) const
@@ -452,17 +352,6 @@ void Tokenizador::cadenaAListaTokens(const string &cadena, list<string> &tokens)
 		lastPos = cadena.find_first_not_of('\n', pos);
 		pos = cadena.find_first_of('\n', lastPos);
 	}
-}
-
-/**
- * @brief Actualiza el valor del estado actual.
- *
- * @param currentState Estado actual.
- * @param character Caracter para calcular el siguiente estado.
- */
-void Tokenizador::nextState(short &currentState, const char &caracter) const
-{
-	currentState = TP_AUTOMATA[currentState][calcularConjunto(caracter)];
 }
 
 /**
@@ -490,9 +379,9 @@ void Tokenizador::updateTokens(short &currentState, const char *cadena, std::str
 		currentState = 0;
 		break;
 	case 40:
-		cadenaTokens.push_back('0');
-		cadenaTokens.append(std::string(cadena, principio, currentPos - principio - 1));
-		cadenaTokens.push_back('\n');
+		//cadenaTokens.push_back('0');
+		cadenaTokens.append('0' + std::string(cadena, principio, currentPos - principio - 1) + '\n');
+		//cadenaTokens.push_back('\n');
 		currentState = 0;
 		break;
 	case 41:
@@ -642,7 +531,6 @@ bool Tokenizador::TokenizarListaFicheros(const string &NomFichEntr) const
 			getline(i, cadena);
 			if (cadena.length() != 0)
 			{
-				// Tokenizar(cadena);
 				TokenizarFicheroOptimizado(cadena);
 			}
 		}
@@ -698,54 +586,6 @@ void Tokenizador::AnyadirDelimitadoresPalabra(const string &nuevoDelimiters)
 	}
 
 	this->delimitadoresEspeciales = eliminarCaracteresRepetidos(this->delimiters + " \n");
-}
-
-/**
- * @brief Getter de la variable "delimiters".
- *
- * @return Delimiters
- */
-string Tokenizador::DelimitadoresPalabra() const
-{
-	// return this->delimiters.delimitadoresOrdenados;
-	return this->delimiters;
-}
-
-/**
- * @brief Setter de la variable casosEspeciales
- *
- * @param nuevoCasosEspeciales Nuevo casos especiales
- */
-void Tokenizador::CasosEspeciales(const bool &nuevoCasosEspeciales)
-{
-
-	this->casosEspeciales = nuevoCasosEspeciales;
-}
-
-/**
- * @brief Getter de casos especiales
- */
-bool Tokenizador::CasosEspeciales() const
-{
-	return this->casosEspeciales;
-}
-
-/**
- * @brief Setter de la variable pasarAminuscSinAcentos
- *
- * @param nuevoPasarAminuscSinAcentos Nuevo valor de pasarAmunuscSinAcentos
- */
-void Tokenizador::PasarAminuscSinAcentos(const bool &nuevoPasarAminuscSinAcentos)
-{
-	this->pasarAminuscSinAcentos = nuevoPasarAminuscSinAcentos;
-}
-
-/**
- * @brief Getter de pasarAminuscSinAcentos
- */
-bool Tokenizador::PasarAminuscSinAcentos() const
-{
-	return this->pasarAminuscSinAcentos;
 }
 
 /**
