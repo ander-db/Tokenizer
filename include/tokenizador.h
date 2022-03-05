@@ -98,12 +98,14 @@ private:
 	}
 
 	void updateTokens(short &, const char *, std::string &, size_t &, size_t &, int &) const;
-	void updateTokens(short &, const string &, std::string &, size_t &, size_t &, int &) const;
+	void updateTokens(short &, const string &, std::string &, int &, int &, int &) const;
 	void minusculaSinAcento(char &) const;
 	void cadenaAListaTokens(const string &, list<string> &) const;
 
 	void TokenizarCasosEspeciales(const std::string &, list<string> &) const;
 	void TokenizarCasosEspeciales(std::string &) const;
+
+	bool TokenizarFicheroOptimizado(const string &NomFichEntr) const; 
 
 public:
 	Tokenizador(const string &delimitadoresPalabra, const bool &kcasosEspeciales, const bool &minuscSinAcentos);
@@ -124,7 +126,6 @@ public:
 
 	bool TokenizarOptimizado(string &) const;
 
-	bool TokenizarFicheroOptimizado(const string &i) const;
 
 	bool TokenizarListaFicheros(const string &i) const;
 
