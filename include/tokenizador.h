@@ -97,15 +97,13 @@ private:
 		currentState = TP_AUTOMATA[currentState][calcularConjunto(caracter)];
 	}
 
-	void updateTokens(short &, const char *, std::string &, size_t &, size_t &, int &) const;
 	void updateTokens(short &, const string &, std::string &, int &, int &, int &) const;
 	void minusculaSinAcento(char &) const;
 	void cadenaAListaTokens(const string &, list<string> &) const;
-
 	void TokenizarCasosEspeciales(const std::string &, list<string> &) const;
-	void TokenizarCasosEspeciales(std::string &) const;
-
+	void TokenizarCasosEspeciales(const std::string &, std::string &) const;
 	bool TokenizarFicheroOptimizado(const string &NomFichEntr) const; 
+	bool TokenizarOptimizado(string &, string &) const;
 
 public:
 	Tokenizador(const string &delimitadoresPalabra, const bool &kcasosEspeciales, const bool &minuscSinAcentos);
@@ -124,7 +122,6 @@ public:
 
 	bool Tokenizar(const string &i) const;
 
-	bool TokenizarOptimizado(string &) const;
 
 
 	bool TokenizarListaFicheros(const string &i) const;
