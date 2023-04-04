@@ -47,7 +47,7 @@ int main(void)
 ```
 
 
-## Whay I Learned
+## What I Learned
 - How to develop automatons for pattern recognition.
 - How to optimize C++ memory.
 - How to optimize C++ execution times.
